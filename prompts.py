@@ -1,5 +1,3 @@
-pypdf
-
 RUBRIC_DIMENSIONS = [
     "AI Use",
     "Research Self-Awareness",
