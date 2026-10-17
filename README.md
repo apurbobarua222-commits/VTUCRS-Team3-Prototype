@@ -1,89 +1,145 @@
-# VTURCS Research-Readiness Chatbot Prototype
 
-A Flask-based prototype for exploring undergraduate research readiness, responsible AI use, and feedback across seven rubric dimensions.
+# VTURCS Research Opportunities Chatbot
+
+**Live Website:**
+https://vtucrs-team3-prototype.onrender.com/
+
+## Overview
+
+The VTURCS Research Opportunities Chatbot is a web-based application designed to help students explore research opportunities available through Virginia Tech's Undergraduate Research in Computer Science (VTURCS) program.
+
+The application provides a conversational interface through which students can discover research projects, understand project requirements, review faculty advisors, and identify opportunities aligned with their academic interests, technical skills, and experience.
+
+The chatbot retrieves project information from the official VTURCS opportunities API and uses a language model to support natural-language interactions.
+
+## Objectives
+
+- Make VTURCS research opportunities easier for students to discover and understand.
+- Help students identify research projects aligned with their interests and technical background.
+- Present project descriptions, faculty advisors, required skills, and official project links in a clear format.
+- Support exploration and comparison of research opportunities through a conversational interface.
+- Provide a centralized interface for accessing official VTURCS project information.
 
 ## Features
 
-- Interactive browser-based chat interface.
-- Base and experimental prompt configurations.
-- Three standardized hypothetical scenarios.
-- Seven research-readiness rubric dimensions.
-- Provider-configurable API connection using an OpenAI-compatible endpoint.
-- API credentials kept on the server, not in browser code.
+### Research Project Discovery
 
-## Important research limitations
+Students can request information about available VTURCS research projects and review the opportunities returned by the official project data source.
 
-This is an experimental prototype. Its scores, if requested from the model, are **model-generated scores**, not independently validated measures of student readiness. Do not use them as admissions decisions or as proof of competence. The base/experimental comparison changes the full prompt configuration, so it does not isolate the effect of any single prompt component. The scenarios are hypothetical and cannot establish real-world validity.
+### Personalized Project Exploration
 
-Before using this with real participants, obtain appropriate research/ethics guidance, explain data collection, minimize retention of personal data, and do not enter identifiable or confidential participant data.
+Students can describe their interests, skills, coursework, and previous experience to explore research opportunities that may be relevant to their backgrounds.
 
-## Requirements
+Recommendations are intended to support exploration and do not guarantee project acceptance or faculty availability.
 
-- Python 3.10 or later
-- API access from a provider that hosts GPT-OSS and offers an OpenAI-compatible chat-completions endpoint
+### Project Details
 
-A standard OpenAI API key should not be assumed to provide access to a separately hosted GPT-OSS model. Confirm the provider's endpoint and model identifier.
+Where the official project records provide the information, the application presents:
 
-## Run locally
+- Project title
+- Faculty advisor
+- Project description
+- Required or relevant skills
+- Research areas and tags
+- Project dates
+- Official project link
 
-1. Open this folder in VS Code.
-2. Create and activate a virtual environment:
+Information is limited to the fields available in the source records. Missing details should not be treated as confirmed.
 
-   **Windows PowerShell**
-   ```powershell
-   py -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
+### Project Comparison
 
-   **macOS/Linux**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+Students can compare research opportunities based on their research focus, skills, faculty advisor, and project descriptions.
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Conversational Interface
 
-4. Copy `.env.example` to `.env` and fill in the actual provider values:
-   - `MODEL_API_KEY`
-   - `MODEL_BASE_URL`
-   - `MODEL_NAME`
+The application provides a chat-based interface for asking questions and exploring opportunities using natural language.
 
-5. Start the server:
-   ```bash
-   python app.py
-   ```
+### Reference Documents
 
-6. Visit http://127.0.0.1:5000
+The application can load reference documents, including the Virginia Tech Honor Code and research-readiness rubric, for use in the relevant application mode.
 
-If the provider does not support the OpenAI-compatible chat-completions API, adapt the client call to its documented API.
+## Technology Stack
 
-## Push to GitHub
+### Frontend
 
-Check that `.env` is not staged:
-```bash
-git status
+- HTML5
+- CSS3
+- JavaScript
+- Marked.js for Markdown rendering
+
+### Backend
+
+- Python
+- Flask
+- OpenAI-compatible API client
+- Requests for retrieving project data
+- pypdf for extracting text from PDF documents
+
+### Language Model
+
+The application is configured to use an NVIDIA-hosted language model through an OpenAI-compatible API.
+
+The model endpoint, model name, and API key are configured through environment variables.
+
+### Data Source
+
+- Official VTURCS opportunities API:
+  https://spring-vturcs-backend.endeavour.cs.vt.edu/opportunities
+
+### Deployment
+
+- GitHub for source code management
+- Render for web application hosting
+
+## Project Structure
+
+```text
+VTUCRS-Team3-Prototype/
+├── app.py
+├── prompts.py
+├── rubric.py
+├── document_loader.py
+├── vturcs_loader.py
+├── nvidia.py
+├── requirements.txt
+├── .gitignore
+├── documents/
+│   ├── vt_honor_code.pdf
+│   └── research_readiness_rubric.pdf
+├── templates/
+│   └── index.html
+└── static/
+    ├── style.css
+    └── chat.js
 ```
 
-Then:
-```bash
-git init
-git add .
-git commit -m "Build research-readiness chatbot prototype"
-git branch -M main
-git remote add origin YOUR_GITHUB_REPOSITORY_URL
-git push -u origin main
-```
+The structure above describes the expected application layout. Keep only files and folders that actually exist in the repository, and ensure that imports match their locations.
 
-Do not replace `YOUR_GITHUB_REPOSITORY_URL` until you have created your own repository.
+## Getting Started
 
-## Deploy
+### Prerequisites
 
-Deploy to a Python-compatible host. Set the API variables in the host's secret/environment settings, and use a production server such as:
-```bash
-gunicorn app:app
-```
+- Python 3.10 or a compatible version supported by the dependencies
+- pip
+- An NVIDIA API key with access to the configured model
+- Internet access for retrieving VTURCS project records
 
-Do not put the API key in HTML, CSS, JavaScript, a public README, or GitHub Actions logs.
+## Deployment
+
+The application is hosted on Render.
+
+Live application:
+https://vtucrs-team3-prototype.onrender.com/
+
+
+## Limitations
+
+- Available project information depends on the official VTURCS API and the completeness of its records.
+- Project availability and details may change over time.
+- Personalized recommendations depend on the information students provide and the model's interpretation of it.
+- Access to the chatbot depends on the availability of the hosted application and the configured language-model API.
+- The application does not guarantee project eligibility, faculty approval, or research placement.
+
+## Acknowledgments
+
+This project is intended to make Virginia Tech undergraduate computer science research opportunities more accessible to students through a conversational interface.
