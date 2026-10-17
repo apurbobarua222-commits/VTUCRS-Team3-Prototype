@@ -9,12 +9,48 @@ document.addEventListener("DOMContentLoaded", () => {
     const statusBadge = document.querySelector("#connection-status");
 
     if (!form || !input || !chatContainer) {
-        console.error("Chat form, input, or message container was not found.");
+        console.error(
+            "Chat form, input, or message container was not found."
+        );
         return;
     }
 
     const conversation = [];
     let waitingForResponse = false;
+
+    // Safely read JSON responses, including handling HTML error pages.
+    async function readJsonResponse(response, requestName) {
+        const raw = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(raw);
+        } catch (error) {
+            console.error(
+                `${requestName}: Expected JSON but received:`,
+                {
+                    status: response.status,
+                    contentType: response.headers.get("content-type"),
+                    body: raw.slice(0, 1000)
+                }
+            );
+
+            throw new Error(
+                `The server returned an invalid response (HTTP ${response.status}). ` +
+                "Check the Flask terminal for the server error."
+            );
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                data.message ||
+                `${requestName} failed (HTTP ${response.status}).`
+            );
+        }
+
+        return data;
+    }
 
     function renderMessage(role, text) {
         const article = document.createElement("article");
@@ -30,9 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const label = document.createElement("div");
         label.className = "message-label";
-        label.textContent = role === "user"
-            ? "You"
-            : "Research Readiness Assistant";
+        label.textContent =
+            role === "user"
+                ? "You"
+                : "Research Readiness Assistant";
 
         const bubble = document.createElement("div");
         bubble.className = "bubble";
@@ -40,12 +77,23 @@ document.addEventListener("DOMContentLoaded", () => {
         const messageText = document.createElement("div");
         messageText.className = "message-text";
 
-        if (typeof marked !== "undefined" &&
-            typeof DOMPurify !== "undefined") {
+        if (role === "user") {
+            // Display user messages as plain text.
+            // This preserves line breaks, numbering, symbols, and spacing.
+            // textContent also prevents user input from being interpreted as HTML.
+            messageText.textContent = String(text);
+            messageText.style.whiteSpace = "pre-wrap";
+            messageText.style.overflowWrap = "anywhere";
+        } else if (
+            typeof marked !== "undefined" &&
+            typeof DOMPurify !== "undefined"
+        ) {
+            // Render assistant responses as Markdown.
             messageText.innerHTML = DOMPurify.sanitize(
                 marked.parse(String(text))
             );
 
+            // Only allow HTTP and HTTPS links.
             messageText.querySelectorAll("a[href]").forEach((link) => {
                 const href = link.getAttribute("href");
 
@@ -58,7 +106,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 link.rel = "noopener noreferrer";
             });
         } else {
+            // Fallback if Markdown libraries are unavailable.
             messageText.textContent = String(text);
+            messageText.style.whiteSpace = "pre-wrap";
+            messageText.style.overflowWrap = "anywhere";
         }
 
         bubble.appendChild(messageText);
@@ -69,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chatContainer.appendChild(article);
 
         chatContainer.scrollTop = chatContainer.scrollHeight;
+
         return article;
     }
 
@@ -99,6 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chatContainer.appendChild(article);
 
         chatContainer.scrollTop = chatContainer.scrollHeight;
+
         return article;
     }
 
@@ -107,13 +160,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await fetch("/api/config");
-            if (!response.ok) {
-                throw new Error(`Configuration check failed (${response.status}).`);
-            }
+            const data = await readJsonResponse(
+                response,
+                "Configuration check"
+            );
 
-            const data = await response.json();
-
-            // Accept common field names from the configuration endpoint.
             const configured =
                 data.model_configured ??
                 data.configured ??
@@ -129,11 +180,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 statusBadge.classList.remove("connected");
                 statusBadge.classList.add("error", "status-error");
             } else {
-                statusBadge.textContent = "Configuration status unavailable";
+                statusBadge.textContent =
+                    "Configuration status unavailable";
             }
         } catch (error) {
             console.error("Configuration check failed:", error);
-            statusBadge.textContent = "Could not check model configuration";
+
+            statusBadge.textContent =
+                "Could not check model configuration";
+
+            statusBadge.classList.remove("connected");
             statusBadge.classList.add("error", "status-error");
         }
     }
@@ -149,7 +205,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!message) return;
 
-        conversation.push({ role: "user", content: message });
+        // Save the original message without Markdown conversion.
+        conversation.push({
+            role: "user",
+            content: message
+        });
+
         renderMessage("user", message);
 
         input.value = "";
@@ -159,14 +220,30 @@ document.addEventListener("DOMContentLoaded", () => {
         const sendButton = form.querySelector(
             'button[type="submit"], input[type="submit"]'
         );
+
+        const suggestionButtons = document.querySelectorAll(
+            "#suggestions .suggestion[data-message]"
+        );
+
         if (sendButton) sendButton.disabled = true;
+
+        if (startScenarioButton) {
+            startScenarioButton.disabled = true;
+        }
+
+        suggestionButtons.forEach((button) => {
+            button.disabled = true;
+        });
 
         const loading = renderLoading();
 
         try {
             const response = await fetch("/api/chat", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
                 body: JSON.stringify({
                     messages: conversation.slice(-30),
                     mode: modeSelect
@@ -178,32 +255,35 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || `Chat request failed (${response.status}).`
-                );
-            }
+            const data = await readJsonResponse(
+                response,
+                "Chat request"
+            );
 
             const reply =
                 typeof data.reply === "string" && data.reply.trim()
                     ? data.reply
                     : "The assistant returned an empty response.";
 
-            conversation.push({ role: "assistant", content: reply });
+            conversation.push({
+                role: "assistant",
+                content: reply
+            });
+
             renderMessage("assistant", reply);
         } catch (error) {
             console.error("Chat request failed:", error);
 
             renderMessage(
                 "assistant",
-                `Sorry, something went wrong: ${error.message || "Please try again."}`
+                `Sorry, something went wrong: ${
+                    error.message || "Please try again."
+                }`
             );
 
-            // Remove the failed user turn from the conversation history.
+            // Remove the failed user message from conversation history.
             if (
-                conversation.length &&
+                conversation.length > 0 &&
                 conversation[conversation.length - 1].role === "user"
             ) {
                 conversation.pop();
@@ -211,18 +291,28 @@ document.addEventListener("DOMContentLoaded", () => {
         } finally {
             loading.remove();
             waitingForResponse = false;
+
             if (sendButton) sendButton.disabled = false;
+
+            if (startScenarioButton) {
+                startScenarioButton.disabled = false;
+            }
+
+            suggestionButtons.forEach((button) => {
+                button.disabled = false;
+            });
+
             input.focus();
         }
     }
 
-    // Normal send button.
+    // Handle the normal chat form submission.
     form.addEventListener("submit", (event) => {
         event.preventDefault();
         sendMessage();
     });
 
-    // The actual buttons in index.html use .suggestion and data-message.
+    // Handle suggested prompt buttons.
     document.querySelectorAll(
         "#suggestions .suggestion[data-message]"
     ).forEach((button) => {
@@ -231,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Start the selected practice scenario.
+    // Start the selected practice scenario, if the controls exist.
     if (startScenarioButton) {
         startScenarioButton.addEventListener("click", () => {
             if (waitingForResponse) return;
@@ -264,7 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Enter sends; Shift+Enter inserts a new line.
+    // Enter sends; Shift+Enter adds a newline in a textarea.
     input.addEventListener("keydown", (event) => {
         if (
             event.key === "Enter" &&

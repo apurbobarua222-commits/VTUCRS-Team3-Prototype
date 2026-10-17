@@ -102,6 +102,8 @@ def get_client():
     return OpenAI(
         api_key=api_key,
         base_url=base_url,
+        timeout=120.0,
+        max_retries=0,
     )
 
 
@@ -115,35 +117,31 @@ def get_model_name():
 # --------------------------------------------------
 
 def is_project_question(message):
-    """Determine whether the message needs current VTURCS project data."""
+    """Return True when current VTURCS project records are relevant."""
     message = message.lower().strip()
 
     keywords = [
+        "vturcs",
         "project",
         "projects",
-        "opportunit",
+        "research opportunity",
+        "research opportunities",
         "research opening",
         "research openings",
         "research position",
         "research positions",
-        "research listing",
-        "research listings",
         "available research",
         "available projects",
-        "recommend",
-        "suggest a project",
-        "suggest projects",
-        "match my skills",
         "project fit",
         "which research",
         "which project",
         "best project",
         "best projects",
-        "faculty",
-        "advisor",
-        "adviser",
-        "professor",
-        "application",
+        "faculty advisor",
+        "faculty adviser",
+        "project advisor",
+        "project adviser",
+        "professor for",
         "join a lab",
         "join research",
         "get involved in research",
@@ -156,26 +154,85 @@ def is_project_question(message):
         "all projects",
         "every project",
         "list projects",
-        "list all",
-        "show all",
-        "show me all",
-        "available opportunities",
+        "list all projects",
+        "show all projects",
+        "all opportunities",
         "what projects",
-        "what research",
         "research can i join",
-        "research opportunities",
         "find research",
         "find projects",
-        "research at vturcs",
-        "vturcs projects",
-        "vturcs research",
     ]
 
     return any(keyword in message for keyword in keywords)
 
 
+def assistant_asked_for_profile(messages):
+    """Check whether the preceding assistant turn asked for a profile."""
+    for item in reversed(messages[:-1]):
+        if item.get("role") == "assistant":
+            content = item.get("content", "").lower()
+            return (
+                "what research areas interest you most" in content
+                or "what technical skills or tools do you know" in content
+                or "project-matching questions" in content
+            )
+    return False
+
+
+def asks_for_all_projects(message):
+    """Recognize requests to list every available project."""
+    message = message.lower().strip()
+
+    phrases = [
+        "all projects",
+        "every project",
+        "all available projects",
+        "list all",
+        "list every",
+        "show all",
+        "show me all",
+        "every available opportunity",
+        "all opportunities",
+        "all research projects",
+    ]
+
+    return any(phrase in message for phrase in phrases)
+
+
+def needs_official_project_formatting(message, profile_response=False):
+    """Determine whether to append official project details."""
+    if profile_response or asks_for_all_projects(message):
+        return True
+
+    message = message.lower().strip()
+
+    phrases = [
+        "which project",
+        "which projects",
+        "best project",
+        "best projects",
+        "recommend a project",
+        "recommend projects",
+        "recommend a research opportunity",
+        "recommend research opportunities",
+        "match my skills",
+        "match projects",
+        "project fit",
+        "compare projects",
+        "compare these projects",
+        "which opportunity fits",
+        "which opportunities fit",
+        "what project fits",
+        "what projects fit",
+        "what project would fit",
+        "what projects would fit",
+    ]
+
+    return any(phrase in message for phrase in phrases)
+
+
 def is_profile_collection_request(message):
-    """Recognize the button prompt that starts a project-matching interview."""
+    """Recognize the prompt that starts the project-matching interview."""
     message = message.lower().strip()
 
     return (
@@ -204,34 +261,12 @@ def matching_flow_was_started(messages):
     )
 
 
-def asks_for_all_projects(message):
-    """Recognize requests to list every available project."""
-    message = message.lower().strip()
-
-    phrases = [
-        "all projects",
-        "every project",
-        "all available projects",
-        "list all",
-        "list every",
-        "show all",
-        "show me all",
-        "every available opportunity",
-        "all opportunities",
-        "all research projects",
-    ]
-
-    return any(phrase in message for phrase in phrases)
-
-
 # --------------------------------------------------
 # Format project descriptions
 # --------------------------------------------------
 
 def format_project_description(description):
-    """
-    Turn source bullet characters into separate Markdown list items.
-    """
+    """Turn source bullet characters into separate Markdown list items."""
     if not description:
         return "Not listed"
 
@@ -288,10 +323,7 @@ def clean_field(value):
 
 
 def normalize_official_url(url):
-    """
-    Accept only absolute HTTP(S) URLs from the project API.
-    Never construct a URL from a project title.
-    """
+    """Accept only absolute HTTP(S) URLs from the project API."""
     if not isinstance(url, str):
         return None
 
@@ -309,7 +341,7 @@ def format_official_project_matches(
     user_message,
 ):
     """
-    Format project details using official API records.
+    Format official project details from API records.
     The model identifies relevant titles; the application supplies details.
     """
     if not projects:
@@ -346,7 +378,12 @@ def format_official_project_matches(
             "projects, or describe your interests and skills again."
         )
 
-    output = ["## VTURCS Project Matches"]
+    output = []
+
+    if answer.strip():
+        output.extend([answer.strip(), ""])
+
+    output.append("## Official VTURCS Project Details")
 
     for project in selected:
         title = clean_field(project.get("title"))
@@ -461,6 +498,7 @@ def chat():
         }), 400
 
     latest_message = cleaned[-1]["content"]
+    latest_lower = latest_message.lower()
 
     # --------------------------------------------------
     # Choose the assistant configuration
@@ -472,19 +510,49 @@ def chat():
         mode = "experimental"
         system_prompt = EXPERIMENTAL_SYSTEM_PROMPT
 
-        if HONOR_CODE_TEXT:
-            system_prompt += (
-                "\n\nREFERENCE DOCUMENT: VIRGINIA TECH HONOR CODE\n"
-                + HONOR_CODE_TEXT
-            )
-        else:
-            system_prompt += (
-                "\n\nREFERENCE DOCUMENT STATUS:\n"
-                "The Virginia Tech Honor Code PDF could not be loaded. "
-                "Do not pretend to have consulted its contents. "
-                "Be transparent if the user asks about the document."
-            )
+    # Detect when reference documents are relevant.
+    asks_about_readiness = any(
+        term in latest_lower
+        for term in (
+            "readiness score",
+            "research readiness",
+            "readiness assessment",
+            "score my",
+            "assess my",
+            "assess readiness",
+            "rubric",
+            "dimension score",
+        )
+    )
 
+    asks_about_integrity_or_ethics = any(
+        term in latest_lower
+        for term in (
+            "honor code",
+            "academic integrity",
+            "plagiarism",
+            "citation",
+            "ethics",
+            "ethical",
+            "participant data",
+            "privacy",
+            "consent",
+            "fabricat",
+            "attribution",
+            "disclose ai",
+            "responsible ai",
+        )
+    )
+
+    # Include the rubric in experimental mode or when a score is requested.
+    include_rubric = (
+        mode == "experimental"
+        or asks_about_readiness
+    )
+
+    include_honor_code = asks_about_integrity_or_ethics
+
+    if include_rubric:
         if RUBRIC_DOCUMENT_TEXT:
             system_prompt += (
                 "\n\nREFERENCE DOCUMENT: RESEARCH-READINESS RUBRIC\n"
@@ -494,16 +562,28 @@ def chat():
             system_prompt += (
                 "\n\nREFERENCE DOCUMENT STATUS:\n"
                 "The research-readiness rubric PDF could not be loaded. "
-                "Do not pretend to have consulted its contents or invent "
-                "criteria from that document."
+                "Do not pretend to have consulted it or invent its criteria."
             )
 
+    if include_honor_code:
+        if HONOR_CODE_TEXT:
+            system_prompt += (
+                "\n\nREFERENCE DOCUMENT: VIRGINIA TECH HONOR CODE\n"
+                + HONOR_CODE_TEXT
+            )
+        else:
+            system_prompt += (
+                "\n\nREFERENCE DOCUMENT STATUS:\n"
+                "The Virginia Tech Honor Code PDF could not be loaded. "
+                "Do not pretend to have consulted its contents."
+            )
+
+    if include_rubric or include_honor_code:
         system_prompt += (
-            "\n\nUse loaded documents as reference material. "
-            "Do not invent policies or rubric criteria that the documents "
-            "do not support. If the documents do not answer a question, "
-            "say so. Do not determine whether a student has committed "
-            "an Honor Code violation."
+            "\n\nUse reference documents only for what they actually support. "
+            "Do not invent rubric criteria or university policies. "
+            "If a document does not answer a question, say so. "
+            "Do not determine whether a student has committed an Honor Code violation."
         )
 
     # --------------------------------------------------
@@ -523,7 +603,7 @@ def chat():
                 )
 
     # --------------------------------------------------
-    # Determine whether this is the first matching turn
+    # Determine whether this is a project-matching conversation
     # --------------------------------------------------
 
     profile_collection_request = is_profile_collection_request(
@@ -532,14 +612,20 @@ def chat():
 
     matching_flow_active = matching_flow_was_started(cleaned)
 
-    # The first click collects the user's profile. On later turns, retrieve
-    # projects even if the user's profile does not contain project keywords.
+    profile_response = (
+        matching_flow_active
+        and not profile_collection_request
+        and assistant_asked_for_profile(cleaned)
+    )
+
     project_question = (
         is_project_question(latest_message)
-        or (
-            matching_flow_active
-            and not profile_collection_request
-        )
+        or profile_response
+    )
+
+    format_projects = needs_official_project_formatting(
+        latest_message,
+        profile_response=profile_response,
     )
 
     # --------------------------------------------------
@@ -559,7 +645,7 @@ def chat():
 
             if not project_data or not str(project_data).strip():
                 project_data = (
-                    "ERROR: No VTURCS project data was returned. "
+                    "No VTURCS project data was returned. "
                     "Do not invent projects or project links."
                 )
 
@@ -600,6 +686,16 @@ def chat():
             )
 
     system_prompt += "\n\n" + CONCISE_RESPONSE_GUIDANCE
+
+    system_prompt += """
+ADDITIONAL APPLICATION RULES:
+- Answer general questions conversationally; do not force them into project matching.
+- Use the conversation history to answer follow-up questions.
+- For project listings or recommendations, name only exact project titles from the supplied records.
+- Do not write or guess project URLs; the application will add official URLs from records.
+- For readiness scoring, use the supplied seven-dimension framework and loaded rubric when available.
+- If there is insufficient evidence for a score, say what evidence is missing rather than guessing.
+"""
 
     # --------------------------------------------------
     # Guide the project-matching interview
@@ -643,6 +739,7 @@ the application can safely format official details and links.
                 *cleaned,
             ],
             temperature=0.3,
+            max_tokens=1200,
         )
 
         answer = response.choices[0].message.content or ""
@@ -650,8 +747,8 @@ the application can safely format official details and links.
         if not answer.strip():
             answer = "I didn't receive a usable response. Please try again."
 
-        # Guarantee that the first matching turn asks questions instead of
-        # trying to match a response to official project titles.
+        # Ensure the first matching turn asks questions instead of trying
+        # to match a response to official project titles.
         if profile_collection_request:
             answer = (
                 "Absolutely! I can help match you with VTURCS research projects.\n\n"
@@ -671,9 +768,9 @@ the application can safely format official details and links.
                 "projects."
             )
 
-        # For project questions, replace model-written project details with
-        # official record data. Never run this formatter on the first turn.
-        if project_question and not profile_collection_request:
+        # Only format official records for project listing or matching tasks.
+        # General questions and ordinary follow-ups remain conversational.
+        if format_projects and not profile_collection_request:
             answer = format_official_project_matches(
                 answer=answer,
                 projects=project_records,
