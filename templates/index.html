@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VTURCS | Research Opportunities</title>
+
+    <meta
+        name="description"
+        content="Explore, compare, and discover undergraduate research opportunities listed by VTURCS."
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+
+            <!-- BRAND -->
+            <a class="brand" href="/" aria-label="VTURCS home">
+                <span class="brand-mark" aria-label="VT monogram">VT</span>
+                <span class="brand-name">VTURCS</span>
+            </a>
+
+            <!-- SIDEBAR INTRODUCTION -->
+            <section class="sidebar-heading">
+                <p class="eyebrow">Research Opportunities</p>
+
+                <h1>VTURCS<br>Projects</h1>
+
+                <p class="sidebar-description">
+                    Discover and compare undergraduate research projects
+                    using official VTURCS project information.
+                </p>
+            </section>
+
+            <!-- ASSISTANT CONFIGURATION -->
+            <section class="sidebar-section">
+                <label for="mode">Assistant configuration</label>
+
+                <select id="mode" name="mode">
+                    <option value="experimental" selected>
+                        Experimental assistant
+                    </option>
+
+                    <option value="base">
+                        Base assistant
+                    </option>
+                </select>
+
+                <p class="helper-text">
+                    Switch between the two configured assistant prompts.
+                </p>
+            </section>
+
+            <!-- PROJECT-ONLY INFORMATION -->
+            <section class="research-note">
+                <h2>Project-only assistant</h2>
+
+                <p>
+                    This assistant is designed to explore, explain, match,
+                    and compare projects listed in the official VTURCS
+                    project records.
+                </p>
+
+                <p>
+                    Project details and links should come from those
+                    records. A listing does not guarantee that a professor
+                    is currently recruiting.
+                </p>
+            </section>
+
+            <!-- SIDEBAR FOOTER -->
+            <div class="sidebar-footer">
+                <span class="footer-dot" aria-hidden="true"></span>
+
+                <span>
+                    Prototype · Avoid sharing private information
+                </span>
+            </div>
+
+        </aside>
+
+        <!-- MAIN CHAT AREA -->
+        <main class="chat-area">
+
+            <!-- CHAT HEADER -->
+            <header class="chat-header">
+                <div>
+                    <p class="eyebrow">Your VTURCS research workspace</p>
+
+                    <h2>Find your research fit</h2>
+
+                    <p class="chat-subtitle">
+                        Explore official projects, discover relevant
+                        opportunities, and compare project details.
+                    </p>
+                </div>
+
+                <div
+                    id="connection-status"
+                    class="status-badge"
+                    role="status"
+                    aria-live="polite"
+                >
+                    Checking model configuration…
+                </div>
+            </header>
+
+            <!-- CHAT CONVERSATION -->
+            <section
+                id="messages"
+                class="messages"
+                aria-label="VTURCS project conversation"
+                aria-live="polite"
+                aria-relevant="additions"
+            >
+
+                <!-- INITIAL ASSISTANT MESSAGE -->
+                <article class="message assistant">
+
+                    <div class="avatar" aria-hidden="true">VT</div>
+
+                    <div class="message-content">
+
+                        <div class="message-label">
+                            VTURCS Project Assistant
+                        </div>
+
+                        <div class="bubble">
+                            <div class="message-text">
+                                <p>
+                                    Welcome to VTURCS Projects!
+                                    I can help you explore official
+                                    undergraduate research opportunities.
+                                </p>
+
+                                <p>
+                                    You can ask me to list available projects,
+                                    find projects that match your skills,
+                                    or compare opportunities by faculty
+                                    advisor, required skills, and description.
+                                </p>
+
+                                <p>
+                                    Choose one of the prompts below to begin.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </article>
+
+            </section>
+
+            <!-- SUGGESTED PROJECT PROMPTS -->
+            <div
+                id="suggestions"
+                class="suggestions"
+                aria-label="Suggested VTURCS project questions"
+            >
+
+                <button
+                    type="button"
+                    class="suggestion"
+                    data-message="List all available VTURCS research projects. For each project, provide its official link, faculty advisor, required skills, and full description. Use only the official VTURCS project records, and format task lists as bullet points."
+                >
+                    <span class="suggestion-title">
+                        Explore VTURCS Projects
+                    </span>
+
+                    <span class="suggestion-description">
+                        Browse project listings, advisors, skills, and descriptions.
+                    </span>
+                </button>
+
+                <button
+                    type="button"
+                    class="suggestion"
+                    data-message="Ask me about my interests, technical skills, and experience. Then recommend up to three VTURCS research projects that best match my profile. Explain why each project matches me, and include its official link, faculty advisor, skills, and description. Use only official project records."
+                >
+                    <span class="suggestion-title">
+                        Match Projects to My Skills
+                    </span>
+
+                    <span class="suggestion-description">
+                        Find projects relevant to my interests and experience.
+                    </span>
+                </button>
+
+                <button
+                    type="button"
+                    class="suggestion"
+                    data-message="Help me compare VTURCS research projects based on research focus, required skills, faculty advisor, and project description. Highlight the differences between the projects and include their official links. Do not invent missing information or include projects outside VTURCS."
+                >
+                    <span class="suggestion-title">
+                        Compare VTURCS Projects
+                    </span>
+
+                    <span class="suggestion-description">
+                        Compare project focus, faculty advisors, and requirements.
+                    </span>
+                </button>
+
+            </div>
+
+            <!-- MESSAGE COMPOSER -->
+            <footer class="composer">
+
+                <form id="chat-form">
+
+                    <textarea
+                        id="message-input"
+                        name="message"
+                        rows="1"
+                        placeholder="Ask about official VTURCS projects…"
+                        aria-label="Ask about VTURCS research projects"
+                        required
+                    ></textarea>
+
+                    <button
+                        id="send-button"
+                        type="submit"
+                        aria-label="Send message"
+                    >
+                        <span aria-hidden="true">↑</span>
+                    </button>
+
+                </form>
+
+                <p class="composer-note">
+                    VTURCS projects only · Verify project details and
+                    recruitment status with the listed faculty advisor.
+                </p>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+    <!-- Markdown renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Sanitize generated HTML before displaying it -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+
+    <!-- Chat functionality -->
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+
+</body>
+</html>
