@@ -65,18 +65,17 @@ RESPONSE STYLE:
 - Use headings and bullet points when helpful.
 - Use normal Markdown without escaping Markdown characters.
 - Do not provide a full rubric analysis unless explicitly requested.
-- Do not invent facts that are not supported by the available information.
+- Do not invent facts that are not supported by available information.
 
 VTURCS PROJECT RULES:
-- Use only the supplied VTURCS project records for project details.
+- Use only supplied VTURCS project records for project details.
 - Never invent project names, faculty, skills, descriptions, or URLs.
 - Never attach a URL to a different project.
 - Use the exact official URL supplied for each project.
 - If a field is missing, say "Not listed".
-- A project listing does not guarantee that a professor is currently recruiting.
-- For project descriptions, preserve the original meaning and task details.
-- When a description contains multiple tasks, format each task as a
-  separate Markdown bullet point.
+- A project listing does not guarantee that a professor is recruiting.
+- Preserve the original meaning of project descriptions.
+- Format multiple tasks as separate Markdown bullet points.
 """
 
 
@@ -91,12 +90,12 @@ def get_client():
 
     if not api_key:
         raise RuntimeError(
-            "MODEL_API_KEY is missing from your .env file."
+            "MODEL_API_KEY is missing from the environment."
         )
 
     if not base_url:
         raise RuntimeError(
-            "MODEL_BASE_URL is missing from your .env file."
+            "MODEL_BASE_URL is missing from the environment."
         )
 
     return OpenAI(
@@ -109,7 +108,10 @@ def get_client():
 
 def get_model_name():
     """Return the configured model name."""
-    return os.getenv("MODEL_NAME", "gpt-oss")
+    return os.getenv(
+        "MODEL_NAME",
+        "gpt-oss",
+    )
 
 
 # --------------------------------------------------
@@ -176,6 +178,7 @@ def assistant_asked_for_profile(messages):
                 or "what technical skills or tools do you know" in content
                 or "project-matching questions" in content
             )
+
     return False
 
 
@@ -199,8 +202,11 @@ def asks_for_all_projects(message):
     return any(phrase in message for phrase in phrases)
 
 
-def needs_official_project_formatting(message, profile_response=False):
-    """Determine whether to append official project details."""
+def needs_official_project_formatting(
+    message,
+    profile_response=False,
+):
+    """Determine whether official project details should be appended."""
     if profile_response or asks_for_all_projects(message):
         return True
 
@@ -245,7 +251,7 @@ def is_profile_collection_request(message):
 
 
 def matching_flow_was_started(messages):
-    """Check whether an earlier user turn started the matching flow."""
+    """Check whether an earlier user turn started project matching."""
     starters = (
         "ask me about my interests",
         "match projects to my skills",
@@ -293,7 +299,7 @@ def format_project_description(description):
     if introduction:
         return (
             f"{introduction}\n\n"
-            f"**Possible tasks include:**\n\n"
+            "**Possible tasks include:**\n\n"
             f"{formatted_tasks}"
         )
 
@@ -323,7 +329,7 @@ def clean_field(value):
 
 
 def normalize_official_url(url):
-    """Accept only absolute HTTP(S) URLs from the project API."""
+    """Accept only absolute HTTP(S) URLs from project API records."""
     if not isinstance(url, str):
         return None
 
@@ -501,7 +507,7 @@ def chat():
     latest_lower = latest_message.lower()
 
     # --------------------------------------------------
-    # Choose the assistant configuration
+    # Choose assistant configuration
     # --------------------------------------------------
 
     if mode == "base":
@@ -544,7 +550,6 @@ def chat():
         )
     )
 
-    # Include the rubric in experimental mode or when a score is requested.
     include_rubric = (
         mode == "experimental"
         or asks_about_readiness
@@ -603,7 +608,7 @@ def chat():
                 )
 
     # --------------------------------------------------
-    # Determine whether this is a project-matching conversation
+    # Determine whether this is project matching
     # --------------------------------------------------
 
     profile_collection_request = is_profile_collection_request(
@@ -739,16 +744,51 @@ the application can safely format official details and links.
                 *cleaned,
             ],
             temperature=0.3,
-            max_tokens=1200,
+
+            # Nemotron uses this token budget for reasoning and final text.
+            # Disabling thinking leaves more budget for the answer.
+            max_tokens=4096,
+            extra_body={
+                "chat_template_kwargs": {
+                    "enable_thinking": False,
+                }
+            },
         )
 
-        answer = response.choices[0].message.content or ""
+        if not response.choices:
+            app.logger.error(
+                "Model returned no choices in its response."
+            )
+            return jsonify({
+                "error": (
+                    "The AI model returned no response. Please try again."
+                )
+            }), 502
+
+        choice = response.choices[0]
+        answer = choice.message.content or ""
+
+        app.logger.info(
+            "Model response received: finish_reason=%s, content_length=%s",
+            choice.finish_reason,
+            len(answer),
+        )
 
         if not answer.strip():
-            answer = "I didn't receive a usable response. Please try again."
+            app.logger.error(
+                "Model returned empty content: finish_reason=%s, usage=%s",
+                choice.finish_reason,
+                response.usage,
+            )
+            return jsonify({
+                "error": (
+                    "The AI model returned an empty answer. Please retry. "
+                    "If the problem continues, check the Render logs."
+                )
+            }), 502
 
-        # Ensure the first matching turn asks questions instead of trying
-        # to match a response to official project titles.
+        # The first matching turn asks questions instead of recommending
+        # projects before the user has provided their profile.
         if profile_collection_request:
             answer = (
                 "Absolutely! I can help match you with VTURCS research projects.\n\n"
@@ -769,7 +809,6 @@ the application can safely format official details and links.
             )
 
         # Only format official records for project listing or matching tasks.
-        # General questions and ordinary follow-ups remain conversational.
         if format_projects and not profile_collection_request:
             answer = format_official_project_matches(
                 answer=answer,
