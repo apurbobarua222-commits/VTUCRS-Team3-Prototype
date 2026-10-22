@@ -35,7 +35,7 @@
 
     --gutter: clamp(20px, 4vw, 52px);
 
-    /* Sidebar width, used to center the VT seal on the full screen */
+    /* Sidebar width. The grid uses it, and the layout reads it on each breakpoint. */
     --sidebar-w: 300px;
 }
 
@@ -309,6 +309,33 @@ a:focus-visible {
     pointer-events: none;
 }
 
+/* Translucent VT watermark, fixed to the exact center of the screen.
+   It sits behind the conversation and does not block clicks. */
+.chat-area::after {
+    content: "VT";
+    position: fixed;
+    top: 50%;
+    left: 50vw;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 150px;
+    transform: translate(-50%, -50%);
+    border: 1.5px solid rgba(134, 31, 65, 0.22);
+    border-radius: 10px;
+    background: rgba(134, 31, 65, 0.1);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    color: rgba(134, 31, 65, 0.3);
+    font-family: var(--font-display);
+    font-size: 64px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    pointer-events: none;
+}
+
 .chat-header {
     position: relative;
     display: flex;
@@ -337,35 +364,6 @@ a:focus-visible {
         rgba(229, 117, 31, 0.75) 65%,
         rgba(229, 117, 31, 0.25) 100%
     );
-    pointer-events: none;
-}
-
-/* Translucent VT seal, centered on the full screen.
-   The header starts at the sidebar edge, so the sidebar width is subtracted
-   from the viewport center. */
-.chat-header::before {
-    content: "VT";
-    position: absolute;
-    bottom: -20px;
-    left: calc(50vw - var(--sidebar-w));
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    transform: translateX(-50%);
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: 4px;
-    background: rgba(134, 31, 65, 0.55);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 6px 18px -8px rgba(58, 11, 28, 0.45);
-    color: rgba(251, 243, 245, 0.92);
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
     pointer-events: none;
 }
 
@@ -429,6 +427,8 @@ a:focus-visible {
     overscroll-behavior: contain;
     scroll-behavior: smooth;
     background: transparent;
+    position: relative;
+    z-index: 1;
 }
 
 .message {
@@ -662,6 +662,8 @@ a:focus-visible {
     flex: 0 0 auto;
     padding: 6px var(--gutter) 18px;
     background: transparent;
+    position: relative;
+    z-index: 1;
 }
 
 .suggestion,
@@ -935,6 +937,12 @@ a:focus-visible {
         background: linear-gradient(90deg, transparent 0%, var(--orange) 40%, var(--orange) 60%, transparent 100%);
     }
 
+    .chat-area::after {
+        width: 96px;
+        height: 96px;
+        font-size: 40px;
+    }
+
     .brand-mark {
         flex-basis: 30px;
         width: 30px;
@@ -988,13 +996,6 @@ a:focus-visible {
 
     .chat-subtitle {
         display: none;
-    }
-
-    .chat-header::before {
-        width: 34px;
-        height: 34px;
-        bottom: -17px;
-        font-size: 13px;
     }
 
     .status-badge {
