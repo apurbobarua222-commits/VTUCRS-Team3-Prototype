@@ -4,7 +4,7 @@
  * Chicago Maroon and burnt orange on a warm Hokie-stone workspace.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 /* --------------------------------------------------
    Design tokens
@@ -309,29 +309,6 @@ a:focus-visible {
     pointer-events: none;
 }
 
-/* Bare italic "VT" watermark, fixed to the exact center of the screen.
-   No box, no border. It sits behind the conversation and does not block clicks. */
-.chat-area::after {
-    content: "VT";
-    position: fixed;
-    top: 50%;
-    left: 50vw;
-    z-index: 0;
-    transform: translate(-50%, -50%);
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 110px;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    white-space: nowrap;
-    color: rgba(134, 31, 65, 0.14);
-    background: none;
-    border: none;
-    box-shadow: none;
-    pointer-events: none;
-}
-
 .chat-header {
     position: relative;
     display: flex;
@@ -423,8 +400,6 @@ a:focus-visible {
     overscroll-behavior: contain;
     scroll-behavior: smooth;
     background: transparent;
-    position: relative;
-    z-index: 1;
 }
 
 .message {
@@ -658,8 +633,6 @@ a:focus-visible {
     flex: 0 0 auto;
     padding: 6px var(--gutter) 18px;
     background: transparent;
-    position: relative;
-    z-index: 1;
 }
 
 .suggestion,
@@ -931,10 +904,6 @@ a:focus-visible {
         width: auto;
         height: 2px;
         background: linear-gradient(90deg, transparent 0%, var(--orange) 40%, var(--orange) 60%, transparent 100%);
-    }
-
-    .chat-area::after {
-        font-size: 64px;
     }
 
     .brand-mark {
