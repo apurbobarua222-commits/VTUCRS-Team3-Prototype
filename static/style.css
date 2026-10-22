@@ -1,30 +1,47 @@
+/*
+ * VTURCS Research Opportunities
+ * Visual direction: "Stone and Maroon". Chicago Maroon sidebar with a faint
+ * limestone grain (a nod to Hokie Stone), a warm stone-gray workspace, and
+ * burnt orange used only as a signal. Serif display type gives it an
+ * academic, editorial voice. Corners are kept tight (4px) for a crisp,
+ * architectural feel instead of soft consumer-app rounding.
+ */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+/* --------------------------------------------------
+   Design tokens
+   -------------------------------------------------- */
 
 :root {
-    --vt-maroon: #861f41;
-    --vt-maroon-deep: #5c1229;
-    --vt-orange: #e5751f;
-    --vt-stone: #75787b;
+    --maroon: #861f41;
+    --maroon-deep: #5b1229;
+    --maroon-night: #3a0b1c;
+    --orange: #e5751f;
+    --orange-soft: #f0a46b;
 
-    --bg: #fcf9f8;
-    --surface: #ffffff;
-    --sidebar: #f5edf0;
-    --blush: #f3e4ea;
-    --text: #2a1a1f;
-    --muted: #6b5a5f;
-    --border: #eadfe3;
+    --stone: #ebe7e1;
+    --stone-deep: #ddd6cd;
+    --paper: #fbfaf7;
+    --ink: #241719;
+    --ink-soft: #5d5256;
+    --muted: #71676a;
+    --line: #d6cdc5;
+    --cream: #fbf3f5;
 
-    --radius-pill: 28px;
-    --radius-card: 18px;
+    --success-ink: #245d3d;
+    --success-bg: #e6f0ea;
+    --success-line: #b8d2c1;
 
-    --shadow-soft: 0 2px 14px rgba(134, 31, 65, 0.08);
-    --shadow-lift: 0 8px 24px rgba(134, 31, 65, 0.14);
-    --accent-glow: linear-gradient(120deg, var(--vt-maroon) 0%, var(--vt-orange) 100%);
+    --font-display: 'Newsreader', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    --font-body: 'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
 
-    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-    --font-body: 'Public Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
+    --gutter: clamp(20px, 4vw, 52px);
 }
+
+/* --------------------------------------------------
+   Base
+   -------------------------------------------------- */
 
 * {
     box-sizing: border-box;
@@ -39,12 +56,13 @@ body {
 
 body {
     overflow: hidden;
-    color: var(--text);
-    background: var(--bg);
+    color: var(--ink);
+    background: var(--stone);
     font-family: var(--font-body);
-    font-size: 15.5px;
+    font-size: 15px;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 button,
@@ -60,41 +78,67 @@ button {
 
 button:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
-    outline: 3px solid rgba(229, 117, 31, 0.55);
-    outline-offset: 2px;
+textarea:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
 }
+
+/* --------------------------------------------------
+   Layout shell
+   -------------------------------------------------- */
 
 .app-layout {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-columns: 300px minmax(0, 1fr);
     width: 100%;
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
 }
 
-/* LEFT SIDEBAR: separated by color, not by a hard line */
+/* --------------------------------------------------
+   Sidebar: maroon with a faint limestone grain
+   -------------------------------------------------- */
 
 .sidebar {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 30px;
     min-width: 0;
     height: 100%;
-    padding: 28px 22px 20px;
+    padding: 32px 26px 22px;
     overflow-y: auto;
-    background: var(--sidebar);
+    color: var(--cream);
+    background-color: var(--maroon-deep);
+    background-image:
+        repeating-linear-gradient(
+            112deg,
+            rgba(255, 255, 255, 0.025) 0 1px,
+            transparent 1px 9px
+        ),
+        linear-gradient(180deg, #6d1a36 0%, var(--maroon-deep) 45%, var(--maroon-night) 100%);
+}
+
+/* Thin orange rule on the sidebar's inner edge */
+.sidebar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, transparent 0%, var(--orange) 40%, var(--orange) 60%, transparent 100%);
+    opacity: 0.85;
+    pointer-events: none;
 }
 
 .brand {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: var(--text);
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    font-weight: 600;
+    color: var(--cream);
     text-decoration: none;
 }
 
@@ -105,57 +149,60 @@ textarea:focus-visible {
     flex: 0 0 42px;
     width: 42px;
     height: 42px;
-    border-radius: 14px;
-    color: #ffffff;
-    background: var(--vt-maroon);
+    border-radius: 4px;
+    color: var(--maroon);
+    background: var(--paper);
     font-family: var(--font-display);
-    font-size: 17px;
+    font-size: 21px;
     font-weight: 600;
-    letter-spacing: -0.5px;
-    box-shadow: 0 4px 12px rgba(134, 31, 65, 0.25);
+    letter-spacing: -0.02em;
 }
 
 .brand-name {
-    color: var(--text);
-    font-weight: 600;
+    color: var(--cream);
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
 }
 
 .sidebar-heading .eyebrow,
 .chat-header .eyebrow {
-    margin: 0 0 6px;
-    color: var(--vt-maroon);
-    font-size: 0.8rem;
+    margin: 0 0 10px;
+    color: var(--orange-soft);
+    font-size: 0.82rem;
     font-weight: 600;
 }
 
 .sidebar-heading h1 {
     margin: 0;
+    color: var(--cream);
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.45rem;
     font-weight: 500;
-    line-height: 1.15;
+    line-height: 1.02;
     letter-spacing: -0.02em;
-    color: var(--text);
 }
 
 .sidebar-description {
-    margin: 14px 0 0;
-    color: var(--muted);
+    margin: 16px 0 0;
+    color: rgba(251, 243, 245, 0.74);
     font-size: 0.92rem;
     line-height: 1.7;
 }
 
-/* SIDEBAR CONTROLS */
+/* Sidebar controls */
 
 .sidebar-section {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 10px;
     min-width: 0;
 }
 
 .sidebar-section label,
 .research-note h2 {
+    color: var(--cream);
     font-size: 0.86rem;
     font-weight: 600;
 }
@@ -163,53 +210,62 @@ textarea:focus-visible {
 .sidebar select {
     width: 100%;
     min-width: 0;
-    min-height: 44px;
-    padding: 10px 14px;
-    color: var(--text);
-    background: var(--surface);
+    min-height: 46px;
+    padding: 10px 40px 10px 14px;
+    color: var(--ink);
+    background-color: var(--paper);
     border: none;
-    border-radius: 14px;
-    box-shadow: 0 0 0 1px var(--border), var(--shadow-soft);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.sidebar select:focus-visible {
+    outline-color: var(--orange-soft);
 }
 
 .helper-text {
     margin: 0;
-    color: var(--muted);
-    font-size: 0.79rem;
+    color: rgba(251, 243, 245, 0.6);
+    font-size: 0.8rem;
     line-height: 1.6;
 }
 
-/* PROJECT-ONLY NOTE: quiet panel, no border */
+/* Project-only note: a plain panel with a top rule, not a card */
 
 .research-note {
-    padding: 16px 17px;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: var(--radius-card);
+    padding: 18px 18px 20px;
+    background: rgba(20, 3, 10, 0.28);
+    border-top: 2px solid var(--orange);
 }
 
 .research-note h2 {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
     font-family: var(--font-display);
-    font-size: 0.98rem;
+    font-size: 1.1rem;
     font-weight: 500;
 }
 
 .research-note p {
     margin: 0;
-    color: var(--muted);
-    font-size: 0.8rem;
-    line-height: 1.65;
+    color: rgba(251, 243, 245, 0.72);
+    font-size: 0.82rem;
+    line-height: 1.7;
+}
+
+.research-note p + p {
+    margin-top: 10px;
 }
 
 .sidebar-footer {
     display: flex;
     align-items: flex-start;
-    gap: 9px;
+    gap: 10px;
     margin-top: auto;
-    padding-top: 16px;
-    color: var(--muted);
-    font-size: 0.74rem;
-    line-height: 1.5;
+    padding-top: 18px;
+    color: rgba(251, 243, 245, 0.6);
+    font-size: 0.76rem;
+    line-height: 1.55;
 }
 
 .footer-dot {
@@ -218,10 +274,12 @@ textarea:focus-visible {
     height: 7px;
     margin-top: 6px;
     border-radius: 50%;
-    background: var(--vt-orange);
+    background: var(--orange);
 }
 
-/* MAIN CHAT COLUMN: warm atmosphere behind the conversation */
+/* --------------------------------------------------
+   Main workspace: warm stone surface
+   -------------------------------------------------- */
 
 .chat-area {
     display: flex;
@@ -231,50 +289,59 @@ textarea:focus-visible {
     height: 100%;
     overflow: hidden;
     background:
-        radial-gradient(900px 520px at 100% -10%, rgba(229, 117, 31, 0.1), transparent 60%),
-        radial-gradient(760px 480px at 0% 115%, rgba(134, 31, 65, 0.07), transparent 60%),
-        var(--bg);
+        radial-gradient(900px 420px at 85% -5%, rgba(229, 117, 31, 0.07), transparent 65%),
+        var(--stone);
 }
 
 .chat-header {
     display: flex;
     flex: 0 0 auto;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 20px;
+    gap: 24px;
     min-width: 0;
-    padding: 26px 40px 8px;
-    background: transparent;
-    animation: rise 0.6s ease both;
+    padding: 34px var(--gutter) 22px;
+    animation: settle 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.chat-header .eyebrow {
+    color: var(--maroon);
 }
 
 .chat-header h2 {
     margin: 0;
+    color: var(--ink);
     font-family: var(--font-display);
-    font-size: 1.7rem;
+    font-size: 2.35rem;
     font-weight: 500;
-    line-height: 1.25;
-    letter-spacing: -0.015em;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 .chat-subtitle {
-    margin: 4px 0 0;
-    color: var(--muted);
-    font-size: 0.88rem;
+    margin: 8px 0 0;
+    max-width: 560px;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
 }
 
 .status-badge {
     flex: 0 0 auto;
-    max-width: 230px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    color: #2f6b4a;
-    background: #eef6f0;
-    font-size: 0.75rem;
+    max-width: 240px;
+    margin-top: 6px;
+    padding: 7px 12px;
+    border: 1px solid var(--success-line);
+    border-radius: 4px;
+    color: var(--success-ink);
+    background: var(--success-bg);
+    font-size: 0.78rem;
+    font-weight: 500;
     overflow-wrap: anywhere;
 }
 
-/* ONLY THE MESSAGES AREA SCROLLS */
+/* --------------------------------------------------
+   Conversation: only this region scrolls
+   -------------------------------------------------- */
 
 #messages,
 .messages {
@@ -282,11 +349,11 @@ textarea:focus-visible {
     flex: 1 1 0;
     flex-direction: column;
     align-items: stretch;
-    gap: 28px;
+    gap: 30px;
     width: 100%;
     min-width: 0;
     min-height: 0;
-    padding: 28px clamp(22px, 6vw, 110px) 32px;
+    padding: 12px var(--gutter) 28px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -294,12 +361,10 @@ textarea:focus-visible {
     background: transparent;
 }
 
-/* MESSAGE LAYOUT */
-
 .message {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
+    gap: 16px;
     width: 100%;
     min-width: 0;
     margin: 0;
@@ -307,42 +372,43 @@ textarea:focus-visible {
 
 .avatar {
     display: flex;
-    flex: 0 0 34px;
+    flex: 0 0 36px;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    color: var(--vt-maroon);
-    background: linear-gradient(135deg, #f1dfe6 0%, #fbe6d8 100%);
-    font-size: 0.8rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    color: var(--paper);
+    background: var(--maroon);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 .message-content {
-    flex: 0 1 820px;
+    flex: 0 1 780px;
     min-width: 0;
-    max-width: calc(100% - 48px);
+    max-width: calc(100% - 52px);
 }
 
 .message-label,
 .message-role {
-    margin: 2px 0 6px;
-    color: var(--vt-maroon);
+    margin: 4px 0 8px;
+    color: var(--maroon);
     font-size: 0.8rem;
     font-weight: 600;
 }
-
-/* Assistant replies sit directly on the page, no bubble */
 
 .bubble {
     min-width: 0;
     padding: 0;
     border: none;
-    border-radius: 0;
     background: transparent;
     overflow-wrap: anywhere;
 }
+
+/* User messages: a solid maroon block, squared on the reply corner */
 
 .message.user {
     justify-content: flex-end;
@@ -359,26 +425,40 @@ textarea:focus-visible {
     text-align: right;
 }
 
-/* User messages are a soft blush pill */
-
 .message.user .bubble {
     max-width: 100%;
-    padding: 12px 19px;
-    border-radius: 24px 24px 8px 24px;
-    background: var(--blush);
-    color: var(--vt-maroon-deep);
+    padding: 13px 18px;
+    border-radius: 4px 4px 0 4px;
+    color: var(--cream);
+    background: var(--maroon);
+    box-shadow: 0 2px 0 var(--maroon-night);
 }
 
 .message.user .avatar {
     order: 2;
+    background: var(--ink);
+    color: var(--cream);
 }
 
-/* MARKDOWN OUTPUT */
+/* Assistant replies: set directly on the stone, with an orange margin rule */
+
+.message.assistant .message-content {
+    padding-left: 0;
+}
+
+.message.assistant .bubble {
+    padding-left: 0;
+}
+
+/* --------------------------------------------------
+   Markdown output
+   -------------------------------------------------- */
 
 .message-text {
     min-width: 0;
+    color: var(--ink);
     font-size: 1rem;
-    line-height: 1.8;
+    line-height: 1.75;
     overflow-wrap: anywhere;
 }
 
@@ -395,65 +475,72 @@ textarea:focus-visible {
 }
 
 .message-text strong {
+    color: var(--maroon-deep);
     font-weight: 600;
-    color: var(--vt-maroon-deep);
 }
 
 .message-text h1,
 .message-text h2,
 .message-text h3 {
-    margin: 24px 0 10px;
+    margin: 26px 0 10px;
+    color: var(--ink);
     font-family: var(--font-display);
     font-weight: 500;
-    line-height: 1.3;
-    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
 }
 
 .message-text h1 {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
 }
 
 .message-text h2 {
-    font-size: 1.35rem;
+    font-size: 1.45rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
 }
 
 .message-text h3 {
-    font-size: 1.1rem;
+    font-size: 1.18rem;
 }
 
 .message-text ul,
 .message-text ol {
-    margin: 9px 0 16px;
-    padding-left: 26px;
+    margin: 10px 0 16px;
+    padding-left: 24px;
 }
 
 .message-text li {
     margin: 6px 0;
+    padding-left: 2px;
+}
+
+.message-text li::marker {
+    color: var(--orange);
 }
 
 .message-text blockquote {
-    margin: 14px 0;
-    padding: 10px 16px;
-    border-left: 3px solid var(--vt-orange);
-    border-radius: 0 12px 12px 0;
-    background: var(--blush);
+    margin: 16px 0;
+    padding: 12px 18px;
+    border-left: 3px solid var(--orange);
+    background: #f6f0eb;
 }
 
 .message-text code {
     padding: 2px 6px;
-    border-radius: 6px;
-    background: #f3eef0;
-    font-family: 'SFMono-Regular', Consolas, monospace;
+    border-radius: 3px;
+    background: #efe9e3;
+    font-family: 'IBM Plex Mono', Consolas, monospace;
     font-size: 0.88em;
 }
 
 .message-text pre {
     max-width: 100%;
-    padding: 14px 16px;
+    padding: 16px 18px;
     overflow-x: auto;
-    border-radius: 14px;
-    background: #f8f4f6;
-    box-shadow: 0 0 0 1px var(--border);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
 }
 
 .message-text pre code {
@@ -462,11 +549,16 @@ textarea:focus-visible {
 }
 
 .message-text a {
-    color: var(--vt-maroon);
+    color: var(--maroon);
     text-decoration: underline;
-    text-decoration-color: rgba(229, 117, 31, 0.6);
+    text-decoration-color: var(--orange);
+    text-decoration-thickness: 1.5px;
     text-underline-offset: 3px;
     overflow-wrap: anywhere;
+}
+
+.message-text a:hover {
+    color: var(--maroon-deep);
 }
 
 .message-text table {
@@ -478,57 +570,93 @@ textarea:focus-visible {
 
 .message-text th,
 .message-text td {
-    padding: 9px 12px;
-    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border: 1px solid var(--line);
     text-align: left;
     vertical-align: top;
 }
 
 .message-text th {
-    background: #f8f2f5;
+    background: #f1ebe5;
+    font-weight: 600;
 }
 
-/* SUGGESTION CARDS */
+/* --------------------------------------------------
+   Suggested prompts: an index of three cards
+   -------------------------------------------------- */
 
 #suggestions,
 .suggestions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
     flex: 0 0 auto;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 8px clamp(22px, 6vw, 110px) 14px;
+    padding: 6px var(--gutter) 18px;
     background: transparent;
 }
 
 .suggestion,
 #suggestions button {
-    min-height: 40px;
-    padding: 10px 16px;
-    border: none;
-    border-radius: var(--radius-card);
-    color: var(--vt-maroon-deep);
-    background: var(--surface);
-    box-shadow: 0 0 0 1px var(--border), 0 1px 2px rgba(42, 26, 31, 0.04);
-    font-size: 0.86rem;
-    font-weight: 500;
-    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-height: 0;
+    padding: 15px 17px 16px;
+    border: 1px solid var(--line);
+    border-top: 3px solid transparent;
+    border-radius: 4px;
+    color: var(--ink);
+    background: var(--paper);
     text-align: left;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    animation: rise 0.6s ease both;
+    line-height: 1.45;
+    transition:
+        border-top-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    animation: settle 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-#suggestions button:nth-child(1) { animation-delay: 0.22s; }
-#suggestions button:nth-child(2) { animation-delay: 0.3s; }
-#suggestions button:nth-child(3) { animation-delay: 0.38s; }
-#suggestions button:nth-child(4) { animation-delay: 0.46s; }
+#suggestions button:nth-child(1) { animation-delay: 0.12s; }
+#suggestions button:nth-child(2) { animation-delay: 0.2s; }
+#suggestions button:nth-child(3) { animation-delay: 0.28s; }
+
+.suggestion-title {
+    display: block;
+    color: var(--maroon-deep);
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.suggestion-description {
+    display: block;
+    color: var(--muted);
+    font-size: 0.83rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
 
 .suggestion:hover,
 #suggestions button:hover {
+    border-top-color: var(--orange);
+    background: #ffffff;
+    box-shadow: 0 10px 22px -12px rgba(91, 18, 41, 0.35);
     transform: translateY(-2px);
-    box-shadow: 0 0 0 1px rgba(229, 117, 31, 0.45), var(--shadow-lift);
 }
 
-/* COMPOSER: floating pill with a gradient edge on focus */
+.suggestion:disabled,
+#suggestions button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+    transform: none;
+}
+
+/* --------------------------------------------------
+   Composer: a squared input bar with a signal line
+   -------------------------------------------------- */
 
 .composer {
     position: relative;
@@ -536,9 +664,9 @@ textarea:focus-visible {
     flex: 0 0 auto;
     width: 100%;
     min-width: 0;
-    padding: 10px clamp(22px, 6vw, 110px) 14px;
+    padding: 6px var(--gutter) 16px;
     background: transparent;
-    animation: rise 0.6s 0.5s ease both;
+    animation: settle 0.7s 0.36s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
 #chat-form {
@@ -548,20 +676,17 @@ textarea:focus-visible {
     width: 100%;
     min-width: 0;
     margin: 0;
-    padding: 8px 8px 8px 20px;
-    border: 1.5px solid transparent;
-    border-radius: var(--radius-pill);
-    background: var(--surface);
-    box-shadow: var(--shadow-soft);
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    padding: 6px 6px 6px 18px;
+    border: 1px solid #cbc1b8;
+    border-radius: 4px;
+    background: var(--paper);
+    box-shadow: 0 1px 0 rgba(36, 23, 25, 0.04), 0 8px 24px -18px rgba(58, 11, 28, 0.5);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 #chat-form:focus-within {
-    border-color: transparent;
-    background:
-        linear-gradient(var(--surface), var(--surface)) padding-box,
-        var(--accent-glow) border-box;
-    box-shadow: 0 6px 28px rgba(134, 31, 65, 0.16);
+    border-color: var(--maroon);
+    box-shadow: 0 2px 0 var(--orange), 0 8px 24px -18px rgba(58, 11, 28, 0.5);
 }
 
 #message-input {
@@ -570,13 +695,13 @@ textarea:focus-visible {
     min-width: 0;
     min-height: 44px;
     max-height: 160px;
-    padding: 10px 4px;
+    padding: 11px 4px;
     resize: none;
     overflow-y: auto;
     border: none;
     outline: none;
     background: transparent;
-    color: var(--text);
+    color: var(--ink);
     font-size: 1rem;
     line-height: 1.5;
 }
@@ -588,7 +713,7 @@ textarea:focus-visible {
 }
 
 #message-input::placeholder {
-    color: #8e8389;
+    color: #958b8f;
 }
 
 #send-button {
@@ -600,37 +725,58 @@ textarea:focus-visible {
     height: 42px;
     padding: 0;
     border: none;
-    border-radius: 50%;
-    color: #ffffff;
-    background: var(--vt-maroon);
-    font-size: 1.4rem;
+    border-radius: 3px;
+    color: var(--paper);
+    background: var(--maroon);
+    font-size: 1.3rem;
     font-weight: 500;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 #send-button:hover {
-    background: var(--vt-maroon-deep);
-    transform: scale(1.04);
+    background: var(--maroon-deep);
 }
 
 #send-button:disabled {
     opacity: 0.4;
-    transform: none;
+    cursor: wait;
 }
 
 .composer-note {
-    margin: 9px 0 0;
-    color: #8b858c;
-    font-size: 0.7rem;
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 0.72rem;
     text-align: center;
 }
 
-/* ONE ORCHESTRATED LOAD SEQUENCE */
+/* --------------------------------------------------
+   States
+   -------------------------------------------------- */
 
-@keyframes rise {
+.loading-message .bubble {
+    color: var(--muted);
+}
+
+.loading-text,
+.loading-message .bubble {
+    font-style: italic;
+    animation: breathe 1.4s ease-in-out infinite;
+}
+
+.status-error {
+    color: #8c1d1d !important;
+    background: #fbeeee !important;
+    border-color: #e9c2c2 !important;
+}
+
+/* --------------------------------------------------
+   Motion
+   -------------------------------------------------- */
+
+@keyframes settle {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(12px);
     }
 
     to {
@@ -639,7 +785,19 @@ textarea:focus-visible {
     }
 }
 
-/* RESPONSIVE: TABLETS */
+@keyframes breathe {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* --------------------------------------------------
+   Responsive: tablet
+   -------------------------------------------------- */
 
 @media (max-width: 900px) {
     .app-layout {
@@ -647,22 +805,26 @@ textarea:focus-visible {
     }
 
     .sidebar {
-        padding: 22px 16px;
-        gap: 22px;
+        padding: 26px 20px 18px;
+        gap: 24px;
     }
 
     .sidebar-heading h1 {
-        font-size: 1.7rem;
+        font-size: 2rem;
     }
 
     .chat-header {
-        align-items: flex-start;
-        padding: 20px 22px 6px;
+        padding: 26px 22px 18px;
+    }
+
+    .chat-header h2 {
+        font-size: 1.9rem;
     }
 
     #messages,
     .messages {
-        padding: 24px 22px 28px;
+        padding-right: 22px;
+        padding-left: 22px;
     }
 
     #suggestions,
@@ -673,78 +835,82 @@ textarea:focus-visible {
     }
 }
 
-/* RESPONSIVE: MOBILE */
+/* --------------------------------------------------
+   Responsive: mobile
+   -------------------------------------------------- */
 
 @media (max-width: 650px) {
-    body {
-        overflow: hidden;
-    }
-
     .app-layout {
         grid-template-columns: minmax(0, 1fr);
         grid-template-rows: auto minmax(0, 1fr);
     }
 
     .sidebar {
-        gap: 10px;
-        max-height: 36dvh;
-        padding: 12px 15px;
+        gap: 12px;
+        max-height: 34dvh;
+        padding: 14px 16px 12px;
         overflow-y: auto;
     }
 
-    .brand {
-        font-size: 0.9rem;
+    .sidebar::after {
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, var(--orange) 40%, var(--orange) 60%, transparent 100%);
     }
 
     .brand-mark {
         flex-basis: 30px;
         width: 30px;
         height: 30px;
-        border-radius: 9px;
-        font-size: 14px;
+        font-size: 15px;
+    }
+
+    .brand-name {
+        font-size: 1rem;
     }
 
     .sidebar-heading h1 {
-        font-size: 1.5rem;
-        line-height: 1.2;
+        font-size: 1.6rem;
+        line-height: 1.1;
     }
 
     .sidebar-heading .eyebrow {
-        margin-bottom: 2px;
-        font-size: 0.7rem;
+        margin-bottom: 4px;
+        font-size: 0.72rem;
     }
 
     .sidebar-description,
     .research-note,
-    .sidebar-footer {
-        display: none;
-    }
-
-    .sidebar-section {
-        gap: 5px;
-    }
-
-    .sidebar-section label {
-        font-size: 0.77rem;
-    }
-
-    .sidebar select {
-        min-height: 38px;
-        padding: 6px 10px;
-        font-size: 0.84rem;
-    }
-
+    .sidebar-footer,
     .helper-text {
         display: none;
     }
 
+    .sidebar-section {
+        gap: 6px;
+    }
+
+    .sidebar-section label {
+        font-size: 0.78rem;
+    }
+
+    .sidebar select {
+        min-height: 38px;
+        padding: 6px 34px 6px 12px;
+        font-size: 0.88rem;
+    }
+
     .chat-header {
         gap: 10px;
-        padding: 12px 14px 4px;
+        padding: 16px 16px 10px;
     }
 
     .chat-header h2 {
-        font-size: 1.2rem;
+        font-size: 1.45rem;
     }
 
     .chat-subtitle {
@@ -752,59 +918,63 @@ textarea:focus-visible {
     }
 
     .status-badge {
-        max-width: 135px;
+        max-width: 130px;
+        margin-top: 2px;
         font-size: 0.66rem;
     }
 
     #messages,
     .messages {
         gap: 20px;
-        padding: 18px 14px;
+        padding: 10px 14px 18px;
     }
 
     .message {
-        gap: 9px;
+        gap: 10px;
     }
 
     .avatar {
-        flex-basis: 29px;
-        width: 29px;
-        height: 29px;
+        flex: 0 0 30px;
+        width: 30px;
+        height: 30px;
+        font-size: 0.78rem;
     }
 
     .message-content {
-        max-width: calc(100% - 38px);
-    }
-
-    .bubble {
-        padding: 0;
+        max-width: calc(100% - 40px);
     }
 
     .message.user .bubble {
         padding: 10px 14px;
     }
 
+    .message-text {
+        font-size: 0.95rem;
+    }
+
     #suggestions,
     .suggestions {
-        gap: 7px;
-        padding: 6px 14px 8px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+        padding: 4px 14px 10px;
     }
 
     .suggestion,
     #suggestions button {
-        min-height: 34px;
-        padding: 7px 11px;
-        font-size: 0.76rem;
+        padding: 11px 13px 12px;
+    }
+
+    .suggestion-title {
+        font-size: 1rem;
     }
 
     .composer {
-        padding: 8px 12px max(10px, env(safe-area-inset-bottom));
+        padding: 4px 12px max(10px, env(safe-area-inset-bottom));
     }
 
     #chat-form {
         gap: 6px;
-        padding: 5px 5px 5px 14px;
-        border-radius: 999px;
+        padding: 4px 4px 4px 12px;
     }
 
     #message-input {
@@ -812,35 +982,13 @@ textarea:focus-visible {
     }
 
     .composer-note {
-        font-size: 0.62rem;
+        font-size: 0.64rem;
     }
 }
 
-/* ERROR AND LOADING STATES */
-
-.status-error {
-    color: #a12626 !important;
-    background: #fff1f1 !important;
-    box-shadow: 0 0 0 1px #f0caca !important;
-}
-
-.loading-text {
-    color: var(--muted);
-    font-style: italic;
-    animation: thinking-pulse 1.3s ease-in-out infinite;
-}
-
-@keyframes thinking-pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-}
-
-/* RESPECT REDUCED MOTION */
+/* --------------------------------------------------
+   Respect reduced-motion preferences
+   -------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
     *,
