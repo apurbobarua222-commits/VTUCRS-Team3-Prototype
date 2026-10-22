@@ -1,5 +1,5 @@
 /*
- * VTURCS Research Opportunities: final stylesheet
+ * VTURCS Research Opportunities: complete stylesheet
  * Replace the entire contents of static/style.css with this file.
  * Chicago Maroon and burnt orange on a warm Hokie-stone workspace.
  */
@@ -34,6 +34,9 @@
     --font-body: 'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
 
     --gutter: clamp(20px, 4vw, 52px);
+
+    /* Sidebar width, used to center the VT seal on the full screen */
+    --sidebar-w: 300px;
 }
 
 /* --------------------------------------------------
@@ -87,7 +90,7 @@ a:focus-visible {
 
 .app-layout {
     display: grid;
-    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
     width: 100%;
     height: 100vh;
     height: 100dvh;
@@ -337,12 +340,14 @@ a:focus-visible {
     pointer-events: none;
 }
 
-/* Centered translucent VT seal sitting on the divider */
+/* Translucent VT seal, centered on the full screen.
+   The header starts at the sidebar edge, so the sidebar width is subtracted
+   from the viewport center. */
 .chat-header::before {
     content: "VT";
     position: absolute;
     bottom: -20px;
-    left: 50%;
+    left: calc(50vw - var(--sidebar-w));
     z-index: 2;
     display: flex;
     align-items: center;
@@ -864,8 +869,8 @@ a:focus-visible {
    -------------------------------------------------- */
 
 @media (max-width: 900px) {
-    .app-layout {
-        grid-template-columns: 250px minmax(0, 1fr);
+    :root {
+        --sidebar-w: 250px;
     }
 
     .sidebar {
@@ -904,6 +909,10 @@ a:focus-visible {
    -------------------------------------------------- */
 
 @media (max-width: 650px) {
+    :root {
+        --sidebar-w: 0px;
+    }
+
     .app-layout {
         grid-template-columns: minmax(0, 1fr);
         grid-template-rows: auto minmax(0, 1fr);
