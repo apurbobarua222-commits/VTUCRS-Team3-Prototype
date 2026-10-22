@@ -1,10 +1,9 @@
 /*
- * VTURCS Research Opportunities
- * Visual direction: "Stone and Maroon". Chicago Maroon sidebar with a faint
- * limestone grain (a nod to Hokie Stone), a warm stone-gray workspace, and
- * burnt orange used only as a signal. Serif display type gives it an
- * academic, editorial voice. Corners are kept tight (4px) for a crisp,
- * architectural feel instead of soft consumer-app rounding.
+ * VTURCS Research Opportunities, v2
+ * Chicago Maroon and burnt orange on a warm Hokie-stone workspace.
+ * Changes from v1: the "ready" status badge is hidden (errors still show),
+ * the input bar is light with a clear border, user message text is readable,
+ * and the main chat area carries more VT character.
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
@@ -21,12 +20,12 @@
     --orange-soft: #f0a46b;
 
     --stone: #ebe7e1;
-    --stone-deep: #ddd6cd;
-    --paper: #fbfaf7;
+    --paper: #ffffff;
     --ink: #241719;
-    --ink-soft: #5d5256;
-    --muted: #71676a;
+    --ink-soft: #55494d;
+    --muted: #6d6265;
     --line: #d6cdc5;
+    --line-strong: #7d6d73;
     --cream: #fbf3f5;
 
     --success-ink: #245d3d;
@@ -98,7 +97,7 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Sidebar: maroon with a faint limestone grain
+   Sidebar (unchanged from v1)
    -------------------------------------------------- */
 
 .sidebar {
@@ -111,17 +110,16 @@ a:focus-visible {
     padding: 32px 26px 22px;
     overflow-y: auto;
     color: var(--cream);
-    background-color: var(--maroon-deep);
+    background-color: #5b1229;
     background-image:
         repeating-linear-gradient(
             112deg,
             rgba(255, 255, 255, 0.025) 0 1px,
             transparent 1px 9px
         ),
-        linear-gradient(180deg, #6d1a36 0%, var(--maroon-deep) 45%, var(--maroon-night) 100%);
+        linear-gradient(180deg, #6d1a36 0%, #5b1229 45%, #3a0b1c 100%);
 }
 
-/* Thin orange rule on the sidebar's inner edge */
 .sidebar::after {
     content: "";
     position: absolute;
@@ -151,7 +149,7 @@ a:focus-visible {
     height: 42px;
     border-radius: 4px;
     color: var(--maroon);
-    background: var(--paper);
+    background: #fbfaf7;
     font-family: var(--font-display);
     font-size: 21px;
     font-weight: 600;
@@ -191,8 +189,6 @@ a:focus-visible {
     line-height: 1.7;
 }
 
-/* Sidebar controls */
-
 .sidebar-section {
     display: flex;
     flex-direction: column;
@@ -213,7 +209,7 @@ a:focus-visible {
     min-height: 46px;
     padding: 10px 40px 10px 14px;
     color: var(--ink);
-    background-color: var(--paper);
+    background-color: #fbfaf7;
     border: none;
     border-radius: 4px;
     font-size: 0.95rem;
@@ -230,8 +226,6 @@ a:focus-visible {
     font-size: 0.8rem;
     line-height: 1.6;
 }
-
-/* Project-only note: a plain panel with a top rule, not a card */
 
 .research-note {
     padding: 18px 18px 20px;
@@ -278,19 +272,39 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Main workspace: warm stone surface
+   Main workspace
    -------------------------------------------------- */
 
 .chat-area {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
     min-height: 0;
     height: 100%;
     overflow: hidden;
-    background:
-        radial-gradient(900px 420px at 85% -5%, rgba(229, 117, 31, 0.07), transparent 65%),
-        var(--stone);
+    background-color: var(--stone);
+    background-image:
+        radial-gradient(900px 420px at 85% -5%, rgba(229, 117, 31, 0.08), transparent 65%),
+        radial-gradient(700px 380px at 0% 110%, rgba(134, 31, 65, 0.06), transparent 70%),
+        repeating-linear-gradient(
+            90deg,
+            rgba(91, 18, 41, 0.025) 0 1px,
+            transparent 1px 8px
+        );
+}
+
+/* Maroon-to-orange band across the top of the workspace */
+.chat-area::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--maroon-deep) 0%, var(--maroon) 55%, var(--orange) 100%);
+    z-index: 3;
+    pointer-events: none;
 }
 
 .chat-header {
@@ -300,7 +314,8 @@ a:focus-visible {
     justify-content: space-between;
     gap: 24px;
     min-width: 0;
-    padding: 34px var(--gutter) 22px;
+    padding: 36px var(--gutter) 24px;
+    border-bottom: 1px solid var(--line);
     animation: settle 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
@@ -310,9 +325,9 @@ a:focus-visible {
 
 .chat-header h2 {
     margin: 0;
-    color: var(--ink);
+    color: var(--maroon-deep);
     font-family: var(--font-display);
-    font-size: 2.35rem;
+    font-size: 2.45rem;
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.02em;
@@ -320,9 +335,14 @@ a:focus-visible {
 
 .chat-subtitle {
     margin: 8px 0 0;
-    max-width: 560px;
+    max-width: 580px;
     color: var(--ink-soft);
-    font-size: 0.92rem;
+    font-size: 0.93rem;
+}
+
+/* The "ready" badge is hidden. Errors such as a missing configuration still show. */
+#connection-status:not(.error):not(.status-error) {
+    display: none;
 }
 
 .status-badge {
@@ -340,7 +360,7 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Conversation: only this region scrolls
+   Conversation
    -------------------------------------------------- */
 
 #messages,
@@ -353,7 +373,7 @@ a:focus-visible {
     width: 100%;
     min-width: 0;
     min-height: 0;
-    padding: 12px var(--gutter) 28px;
+    padding: 30px var(--gutter) 28px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -372,16 +392,17 @@ a:focus-visible {
 
 .avatar {
     display: flex;
-    flex: 0 0 36px;
+    flex: 0 0 38px;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 4px;
-    color: var(--paper);
+    color: #fbfaf7;
     background: var(--maroon);
+    box-shadow: inset 0 -3px 0 var(--orange);
     font-family: var(--font-display);
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
@@ -389,12 +410,12 @@ a:focus-visible {
 .message-content {
     flex: 0 1 780px;
     min-width: 0;
-    max-width: calc(100% - 52px);
+    max-width: calc(100% - 54px);
 }
 
 .message-label,
 .message-role {
-    margin: 4px 0 8px;
+    margin: 6px 0 8px;
     color: var(--maroon);
     font-size: 0.8rem;
     font-weight: 600;
@@ -408,7 +429,7 @@ a:focus-visible {
     overflow-wrap: anywhere;
 }
 
-/* User messages: a solid maroon block, squared on the reply corner */
+/* User messages: solid maroon block, cream text */
 
 .message.user {
     justify-content: flex-end;
@@ -429,25 +450,19 @@ a:focus-visible {
     max-width: 100%;
     padding: 13px 18px;
     border-radius: 4px 4px 0 4px;
-    color: var(--cream);
     background: var(--maroon);
-    box-shadow: 0 2px 0 var(--maroon-night);
+    box-shadow: 0 2px 0 var(--orange);
+}
+
+.message.user .message-text {
+    color: var(--cream);
 }
 
 .message.user .avatar {
     order: 2;
-    background: var(--ink);
     color: var(--cream);
-}
-
-/* Assistant replies: set directly on the stone, with an orange margin rule */
-
-.message.assistant .message-content {
-    padding-left: 0;
-}
-
-.message.assistant .bubble {
-    padding-left: 0;
+    background: var(--ink);
+    box-shadow: inset 0 -3px 0 var(--maroon);
 }
 
 /* --------------------------------------------------
@@ -477,6 +492,10 @@ a:focus-visible {
 .message-text strong {
     color: var(--maroon-deep);
     font-weight: 600;
+}
+
+.message.user .message-text strong {
+    color: #ffffff;
 }
 
 .message-text h1,
@@ -540,7 +559,7 @@ a:focus-visible {
     overflow-x: auto;
     border: 1px solid var(--line);
     border-radius: 4px;
-    background: var(--paper);
+    background: #fbfaf7;
 }
 
 .message-text pre code {
@@ -582,7 +601,7 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Suggested prompts: an index of three cards
+   Suggested prompts
    -------------------------------------------------- */
 
 #suggestions,
@@ -604,15 +623,14 @@ a:focus-visible {
     min-height: 0;
     padding: 15px 17px 16px;
     border: 1px solid var(--line);
-    border-top: 3px solid transparent;
+    border-top: 3px solid var(--maroon);
     border-radius: 4px;
     color: var(--ink);
-    background: var(--paper);
+    background: #ffffff;
     text-align: left;
     line-height: 1.45;
     transition:
         border-top-color 0.2s ease,
-        background-color 0.2s ease,
         box-shadow 0.2s ease,
         transform 0.2s ease;
     animation: settle 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -642,8 +660,7 @@ a:focus-visible {
 .suggestion:hover,
 #suggestions button:hover {
     border-top-color: var(--orange);
-    background: #ffffff;
-    box-shadow: 0 10px 22px -12px rgba(91, 18, 41, 0.35);
+    box-shadow: 0 10px 22px -12px rgba(91, 18, 41, 0.4);
     transform: translateY(-2px);
 }
 
@@ -655,7 +672,7 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Composer: a squared input bar with a signal line
+   Composer: light input with a clear border
    -------------------------------------------------- */
 
 .composer {
@@ -676,17 +693,17 @@ a:focus-visible {
     width: 100%;
     min-width: 0;
     margin: 0;
-    padding: 6px 6px 6px 18px;
-    border: 1px solid #cbc1b8;
-    border-radius: 4px;
-    background: var(--paper);
-    box-shadow: 0 1px 0 rgba(36, 23, 25, 0.04), 0 8px 24px -18px rgba(58, 11, 28, 0.5);
+    padding: 6px 6px 6px 16px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 10px -6px rgba(36, 23, 25, 0.25);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 #chat-form:focus-within {
     border-color: var(--maroon);
-    box-shadow: 0 2px 0 var(--orange), 0 8px 24px -18px rgba(58, 11, 28, 0.5);
+    box-shadow: 0 0 0 3px rgba(229, 117, 31, 0.3);
 }
 
 #message-input {
@@ -713,7 +730,8 @@ a:focus-visible {
 }
 
 #message-input::placeholder {
-    color: #958b8f;
+    color: #6f6468;
+    opacity: 1;
 }
 
 #send-button {
@@ -725,9 +743,10 @@ a:focus-visible {
     height: 42px;
     padding: 0;
     border: none;
-    border-radius: 3px;
-    color: var(--paper);
+    border-radius: 4px;
+    color: #ffffff;
     background: var(--maroon);
+    box-shadow: inset 0 -3px 0 var(--orange);
     font-size: 1.3rem;
     font-weight: 500;
     transition: background-color 0.2s ease;
@@ -818,7 +837,7 @@ a:focus-visible {
     }
 
     .chat-header h2 {
-        font-size: 1.9rem;
+        font-size: 2rem;
     }
 
     #messages,
@@ -906,11 +925,11 @@ a:focus-visible {
 
     .chat-header {
         gap: 10px;
-        padding: 16px 16px 10px;
+        padding: 16px 16px 12px;
     }
 
     .chat-header h2 {
-        font-size: 1.45rem;
+        font-size: 1.5rem;
     }
 
     .chat-subtitle {
@@ -919,14 +938,13 @@ a:focus-visible {
 
     .status-badge {
         max-width: 130px;
-        margin-top: 2px;
         font-size: 0.66rem;
     }
 
     #messages,
     .messages {
         gap: 20px;
-        padding: 10px 14px 18px;
+        padding: 14px 14px 18px;
     }
 
     .message {
@@ -937,7 +955,7 @@ a:focus-visible {
         flex: 0 0 30px;
         width: 30px;
         height: 30px;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
     }
 
     .message-content {
@@ -987,7 +1005,7 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Respect reduced-motion preferences
+   Reduced motion
    -------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
