@@ -1,9 +1,7 @@
 /*
- * VTURCS Research Opportunities, v2
+ * VTURCS Research Opportunities: final stylesheet
+ * Replace the entire contents of static/style.css with this file.
  * Chicago Maroon and burnt orange on a warm Hokie-stone workspace.
- * Changes from v1: the "ready" status badge is hidden (errors still show),
- * the input bar is light with a clear border, user message text is readable,
- * and the main chat area carries more VT character.
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
@@ -97,7 +95,7 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Sidebar (unchanged from v1)
+   Sidebar
    -------------------------------------------------- */
 
 .sidebar {
@@ -120,6 +118,7 @@ a:focus-visible {
         linear-gradient(180deg, #6d1a36 0%, #5b1229 45%, #3a0b1c 100%);
 }
 
+/* Thin orange rule on the sidebar's inner edge */
 .sidebar::after {
     content: "";
     position: absolute;
@@ -308,6 +307,7 @@ a:focus-visible {
 }
 
 .chat-header {
+    position: relative;
     display: flex;
     flex: 0 0 auto;
     align-items: flex-start;
@@ -315,8 +315,53 @@ a:focus-visible {
     gap: 24px;
     min-width: 0;
     padding: 36px var(--gutter) 24px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: none;
     animation: settle 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Thicker translucent divider under the header */
+.chat-header::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(
+        90deg,
+        rgba(91, 18, 41, 0.35) 0%,
+        rgba(134, 31, 65, 0.7) 35%,
+        rgba(229, 117, 31, 0.75) 65%,
+        rgba(229, 117, 31, 0.25) 100%
+    );
+    pointer-events: none;
+}
+
+/* Centered translucent VT seal sitting on the divider */
+.chat-header::before {
+    content: "VT";
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 4px;
+    background: rgba(134, 31, 65, 0.55);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 18px -8px rgba(58, 11, 28, 0.45);
+    color: rgba(251, 243, 245, 0.92);
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    pointer-events: none;
 }
 
 .chat-header .eyebrow {
@@ -429,7 +474,7 @@ a:focus-visible {
     overflow-wrap: anywhere;
 }
 
-/* User messages: solid maroon block, cream text */
+/* User messages: solid maroon block with cream text */
 
 .message.user {
     justify-content: flex-end;
@@ -672,7 +717,7 @@ a:focus-visible {
 }
 
 /* --------------------------------------------------
-   Composer: light input with a clear border
+   Composer
    -------------------------------------------------- */
 
 .composer {
@@ -934,6 +979,13 @@ a:focus-visible {
 
     .chat-subtitle {
         display: none;
+    }
+
+    .chat-header::before {
+        width: 34px;
+        height: 34px;
+        bottom: -17px;
+        font-size: 13px;
     }
 
     .status-badge {
