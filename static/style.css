@@ -1,14 +1,11 @@
 /*
- * VTURCS Research Opportunities: complete stylesheet
- * Replace the entire contents of static/style.css with this file.
- * Chicago Maroon and burnt orange on a warm Hokie-stone workspace.
+ * VTURCS Research Opportunities
+ * compact header, smaller suggestion buttons, boxed AI responses
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
-/* --------------------------------------------------
-   Design tokens
-   -------------------------------------------------- */
+/* design tokens */
 
 :root {
     --maroon: #861f41;
@@ -34,14 +31,10 @@
     --font-body: 'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
 
     --gutter: clamp(20px, 4vw, 52px);
-
-    /* Sidebar width. The grid uses it, and the layout reads it on each breakpoint. */
     --sidebar-w: 300px;
 }
 
-/* --------------------------------------------------
-   Base
-   -------------------------------------------------- */
+/* base */
 
 * {
     box-sizing: border-box;
@@ -84,9 +77,7 @@ a:focus-visible {
     outline-offset: 3px;
 }
 
-/* --------------------------------------------------
-   Layout shell
-   -------------------------------------------------- */
+/* layout */
 
 .app-layout {
     display: grid;
@@ -97,9 +88,7 @@ a:focus-visible {
     overflow: hidden;
 }
 
-/* --------------------------------------------------
-   Sidebar
-   -------------------------------------------------- */
+/* sidebar */
 
 .sidebar {
     position: relative;
@@ -121,7 +110,6 @@ a:focus-visible {
         linear-gradient(180deg, #6d1a36 0%, #5b1229 45%, #3a0b1c 100%);
 }
 
-/* Thin orange rule on the sidebar's inner edge */
 .sidebar::after {
     content: "";
     position: absolute;
@@ -129,7 +117,13 @@ a:focus-visible {
     right: 0;
     bottom: 0;
     width: 2px;
-    background: linear-gradient(180deg, transparent 0%, var(--orange) 40%, var(--orange) 60%, transparent 100%);
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        var(--orange) 40%,
+        var(--orange) 60%,
+        transparent 100%
+    );
     opacity: 0.85;
     pointer-events: none;
 }
@@ -168,7 +162,7 @@ a:focus-visible {
 
 .sidebar-heading .eyebrow,
 .chat-header .eyebrow {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     color: var(--orange-soft);
     font-size: 0.82rem;
     font-weight: 600;
@@ -273,9 +267,7 @@ a:focus-visible {
     background: var(--orange);
 }
 
-/* --------------------------------------------------
-   Main workspace
-   -------------------------------------------------- */
+/* main workspace */
 
 .chat-area {
     position: relative;
@@ -296,18 +288,24 @@ a:focus-visible {
         );
 }
 
-/* Maroon-to-orange band across the top of the workspace */
 .chat-area::before {
     content: "";
     position: absolute;
     top: 0;
     right: 0;
     left: 0;
-    height: 5px;
-    background: linear-gradient(90deg, var(--maroon-deep) 0%, var(--maroon) 55%, var(--orange) 100%);
+    height: 4px;
+    background: linear-gradient(
+        90deg,
+        var(--maroon-deep) 0%,
+        var(--maroon) 55%,
+        var(--orange) 100%
+    );
     z-index: 3;
     pointer-events: none;
 }
+
+/* compact header */
 
 .chat-header {
     position: relative;
@@ -315,21 +313,20 @@ a:focus-visible {
     flex: 0 0 auto;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 24px;
+    gap: 20px;
     min-width: 0;
-    padding: 36px var(--gutter) 24px;
+    padding: 20px var(--gutter) 15px;
     border-bottom: none;
     animation: settle 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-/* Thicker translucent divider under the header */
 .chat-header::after {
     content: "";
     position: absolute;
     right: 0;
     bottom: 0;
     left: 0;
-    height: 4px;
+    height: 3px;
     background: linear-gradient(
         90deg,
         rgba(91, 18, 41, 0.35) 0%,
@@ -341,27 +338,29 @@ a:focus-visible {
 }
 
 .chat-header .eyebrow {
+    margin-bottom: 4px;
     color: var(--maroon);
+    font-size: 0.76rem;
 }
 
 .chat-header h2 {
     margin: 0;
     color: var(--maroon-deep);
     font-family: var(--font-display);
-    font-size: 2.45rem;
+    font-size: 2rem;
     font-weight: 500;
-    line-height: 1.1;
+    line-height: 1.08;
     letter-spacing: -0.02em;
 }
 
 .chat-subtitle {
-    margin: 8px 0 0;
+    margin: 5px 0 0;
     max-width: 580px;
     color: var(--ink-soft);
-    font-size: 0.93rem;
+    font-size: 0.86rem;
+    line-height: 1.5;
 }
 
-/* The "ready" badge is hidden. Errors such as a missing configuration still show. */
 #connection-status:not(.error):not(.status-error) {
     display: none;
 }
@@ -369,20 +368,18 @@ a:focus-visible {
 .status-badge {
     flex: 0 0 auto;
     max-width: 240px;
-    margin-top: 6px;
-    padding: 7px 12px;
+    margin-top: 4px;
+    padding: 6px 10px;
     border: 1px solid var(--success-line);
     border-radius: 4px;
     color: var(--success-ink);
     background: var(--success-bg);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 500;
     overflow-wrap: anywhere;
 }
 
-/* --------------------------------------------------
-   Conversation
-   -------------------------------------------------- */
+/* conversation */
 
 #messages,
 .messages {
@@ -390,11 +387,11 @@ a:focus-visible {
     flex: 1 1 0;
     flex-direction: column;
     align-items: stretch;
-    gap: 30px;
+    gap: 20px;
     width: 100%;
     min-width: 0;
     min-height: 0;
-    padding: 30px var(--gutter) 28px;
+    padding: 20px var(--gutter) 18px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -405,7 +402,7 @@ a:focus-visible {
 .message {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
     width: 100%;
     min-width: 0;
     margin: 0;
@@ -413,17 +410,17 @@ a:focus-visible {
 
 .avatar {
     display: flex;
-    flex: 0 0 38px;
+    flex: 0 0 34px;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: 4px;
     color: #fbfaf7;
     background: var(--maroon);
     box-shadow: inset 0 -3px 0 var(--orange);
     font-family: var(--font-display);
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
@@ -431,16 +428,18 @@ a:focus-visible {
 .message-content {
     flex: 0 1 780px;
     min-width: 0;
-    max-width: calc(100% - 54px);
+    max-width: calc(100% - 48px);
 }
 
 .message-label,
 .message-role {
-    margin: 6px 0 8px;
+    margin: 3px 0 6px;
     color: var(--maroon);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 600;
 }
+
+/* default bubble */
 
 .bubble {
     min-width: 0;
@@ -450,7 +449,38 @@ a:focus-visible {
     overflow-wrap: anywhere;
 }
 
-/* User messages: solid maroon block with cream text */
+/* AI responses inside white boxes */
+
+.message.assistant .message-content,
+.message:not(.user) .message-content {
+    min-width: 0;
+    max-width: 850px;
+}
+
+.message.assistant .bubble,
+.message:not(.user) .bubble {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 14px 18px;
+    border: 1px solid #ded3d5;
+    border-left: 3px solid var(--maroon);
+    border-radius: 4px 10px 10px 10px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(70, 30, 45, 0.06);
+    overflow-wrap: anywhere;
+}
+
+.message.assistant .message-text,
+.message:not(.user) .message-text {
+    width: 100%;
+    min-width: 0;
+    color: var(--ink);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* user messages */
 
 .message.user {
     justify-content: flex-end;
@@ -469,14 +499,19 @@ a:focus-visible {
 
 .message.user .bubble {
     max-width: 100%;
-    padding: 13px 18px;
-    border-radius: 4px 4px 0 4px;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 4px 4px 0 10px;
     background: var(--maroon);
     box-shadow: 0 2px 0 var(--orange);
 }
 
 .message.user .message-text {
     color: var(--cream);
+}
+
+.message.user .message-text strong {
+    color: #ffffff;
 }
 
 .message.user .avatar {
@@ -486,15 +521,13 @@ a:focus-visible {
     box-shadow: inset 0 -3px 0 var(--maroon);
 }
 
-/* --------------------------------------------------
-   Markdown output
-   -------------------------------------------------- */
+/* markdown output */
 
 .message-text {
     min-width: 0;
     color: var(--ink);
-    font-size: 1rem;
-    line-height: 1.75;
+    font-size: 0.96rem;
+    line-height: 1.7;
     overflow-wrap: anywhere;
 }
 
@@ -507,7 +540,11 @@ a:focus-visible {
 }
 
 .message-text p {
-    margin: 0 0 14px;
+    margin: 0 0 12px;
+}
+
+.message-text p:last-child {
+    margin-bottom: 0;
 }
 
 .message-text strong {
@@ -515,14 +552,10 @@ a:focus-visible {
     font-weight: 600;
 }
 
-.message.user .message-text strong {
-    color: #ffffff;
-}
-
 .message-text h1,
 .message-text h2,
 .message-text h3 {
-    margin: 26px 0 10px;
+    margin: 22px 0 9px;
     color: var(--ink);
     font-family: var(--font-display);
     font-weight: 500;
@@ -531,27 +564,27 @@ a:focus-visible {
 }
 
 .message-text h1 {
-    font-size: 1.75rem;
+    font-size: 1.65rem;
 }
 
 .message-text h2 {
-    font-size: 1.45rem;
+    font-size: 1.35rem;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--line);
 }
 
 .message-text h3 {
-    font-size: 1.18rem;
+    font-size: 1.12rem;
 }
 
 .message-text ul,
 .message-text ol {
-    margin: 10px 0 16px;
+    margin: 8px 0 14px;
     padding-left: 24px;
 }
 
 .message-text li {
-    margin: 6px 0;
+    margin: 5px 0;
     padding-left: 2px;
 }
 
@@ -560,8 +593,8 @@ a:focus-visible {
 }
 
 .message-text blockquote {
-    margin: 16px 0;
-    padding: 12px 18px;
+    margin: 14px 0;
+    padding: 10px 16px;
     border-left: 3px solid var(--orange);
     background: #f6f0eb;
 }
@@ -576,7 +609,7 @@ a:focus-visible {
 
 .message-text pre {
     max-width: 100%;
-    padding: 16px 18px;
+    padding: 14px 16px;
     overflow-x: auto;
     border: 1px solid var(--line);
     border-radius: 4px;
@@ -610,7 +643,7 @@ a:focus-visible {
 
 .message-text th,
 .message-text td {
-    padding: 10px 14px;
+    padding: 9px 12px;
     border: 1px solid var(--line);
     text-align: left;
     vertical-align: top;
@@ -621,17 +654,15 @@ a:focus-visible {
     font-weight: 600;
 }
 
-/* --------------------------------------------------
-   Suggested prompts
-   -------------------------------------------------- */
+/* smaller suggestion buttons */
 
 #suggestions,
 .suggestions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 8px;
     flex: 0 0 auto;
-    padding: 6px var(--gutter) 18px;
+    padding: 4px var(--gutter) 10px;
     background: transparent;
 }
 
@@ -640,16 +671,17 @@ a:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 3px;
+    min-width: 0;
     min-height: 0;
-    padding: 15px 17px 16px;
+    padding: 9px 12px 10px;
     border: 1px solid var(--line);
-    border-top: 3px solid var(--maroon);
+    border-top: 2px solid var(--maroon);
     border-radius: 4px;
     color: var(--ink);
     background: #ffffff;
     text-align: left;
-    line-height: 1.45;
+    line-height: 1.35;
     transition:
         border-top-color 0.2s ease,
         box-shadow 0.2s ease,
@@ -657,15 +689,23 @@ a:focus-visible {
     animation: settle 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-#suggestions button:nth-child(1) { animation-delay: 0.12s; }
-#suggestions button:nth-child(2) { animation-delay: 0.2s; }
-#suggestions button:nth-child(3) { animation-delay: 0.28s; }
+#suggestions button:nth-child(1) {
+    animation-delay: 0.12s;
+}
+
+#suggestions button:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+#suggestions button:nth-child(3) {
+    animation-delay: 0.28s;
+}
 
 .suggestion-title {
     display: block;
     color: var(--maroon-deep);
     font-family: var(--font-display);
-    font-size: 1.12rem;
+    font-size: 0.98rem;
     font-weight: 500;
     line-height: 1.25;
 }
@@ -673,16 +713,16 @@ a:focus-visible {
 .suggestion-description {
     display: block;
     color: var(--muted);
-    font-size: 0.83rem;
+    font-size: 0.76rem;
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .suggestion:hover,
 #suggestions button:hover {
     border-top-color: var(--orange);
-    box-shadow: 0 10px 22px -12px rgba(91, 18, 41, 0.4);
-    transform: translateY(-2px);
+    box-shadow: 0 5px 12px -8px rgba(91, 18, 41, 0.4);
+    transform: translateY(-1px);
 }
 
 .suggestion:disabled,
@@ -692,9 +732,7 @@ a:focus-visible {
     transform: none;
 }
 
-/* --------------------------------------------------
-   Composer
-   -------------------------------------------------- */
+/* composer */
 
 .composer {
     position: relative;
@@ -702,7 +740,7 @@ a:focus-visible {
     flex: 0 0 auto;
     width: 100%;
     min-width: 0;
-    padding: 6px var(--gutter) 16px;
+    padding: 4px var(--gutter) 12px;
     background: transparent;
     animation: settle 0.7s 0.36s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
@@ -714,7 +752,7 @@ a:focus-visible {
     width: 100%;
     min-width: 0;
     margin: 0;
-    padding: 6px 6px 6px 16px;
+    padding: 5px 5px 5px 14px;
     border: 1.5px solid var(--line-strong);
     border-radius: 6px;
     background: #ffffff;
@@ -731,9 +769,9 @@ a:focus-visible {
     flex: 1 1 auto;
     width: 100%;
     min-width: 0;
-    min-height: 44px;
+    min-height: 40px;
     max-height: 160px;
-    padding: 11px 4px;
+    padding: 9px 4px;
     resize: none;
     overflow-y: auto;
     border: none;
@@ -757,11 +795,11 @@ a:focus-visible {
 
 #send-button {
     display: flex;
-    flex: 0 0 42px;
+    flex: 0 0 40px;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border: none;
     border-radius: 4px;
@@ -783,15 +821,13 @@ a:focus-visible {
 }
 
 .composer-note {
-    margin: 10px 0 0;
+    margin: 7px 0 0;
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     text-align: center;
 }
 
-/* --------------------------------------------------
-   States
-   -------------------------------------------------- */
+/* states */
 
 .loading-message .bubble {
     color: var(--muted);
@@ -809,9 +845,7 @@ a:focus-visible {
     border-color: #e9c2c2 !important;
 }
 
-/* --------------------------------------------------
-   Motion
-   -------------------------------------------------- */
+/* motion */
 
 @keyframes settle {
     from {
@@ -835,9 +869,7 @@ a:focus-visible {
     }
 }
 
-/* --------------------------------------------------
-   Responsive: tablet
-   -------------------------------------------------- */
+/* tablet */
 
 @media (max-width: 900px) {
     :root {
@@ -854,11 +886,11 @@ a:focus-visible {
     }
 
     .chat-header {
-        padding: 26px 22px 18px;
+        padding: 18px 22px 14px;
     }
 
     .chat-header h2 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     #messages,
@@ -875,9 +907,7 @@ a:focus-visible {
     }
 }
 
-/* --------------------------------------------------
-   Responsive: mobile
-   -------------------------------------------------- */
+/* mobile */
 
 @media (max-width: 650px) {
     :root {
@@ -903,7 +933,13 @@ a:focus-visible {
         left: 0;
         width: auto;
         height: 2px;
-        background: linear-gradient(90deg, transparent 0%, var(--orange) 40%, var(--orange) 60%, transparent 100%);
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            var(--orange) 40%,
+            var(--orange) 60%,
+            transparent 100%
+        );
     }
 
     .brand-mark {
@@ -950,7 +986,11 @@ a:focus-visible {
 
     .chat-header {
         gap: 10px;
-        padding: 16px 16px 12px;
+        padding: 14px 16px 11px;
+    }
+
+    .chat-header .eyebrow {
+        font-size: 0.7rem;
     }
 
     .chat-header h2 {
@@ -968,12 +1008,12 @@ a:focus-visible {
 
     #messages,
     .messages {
-        gap: 20px;
-        padding: 14px 14px 18px;
+        gap: 16px;
+        padding: 12px 14px 14px;
     }
 
     .message {
-        gap: 10px;
+        gap: 9px;
     }
 
     .avatar {
@@ -984,35 +1024,44 @@ a:focus-visible {
     }
 
     .message-content {
-        max-width: calc(100% - 40px);
+        max-width: calc(100% - 39px);
+    }
+
+    .message.assistant .bubble,
+    .message:not(.user) .bubble {
+        padding: 11px 13px;
     }
 
     .message.user .bubble {
-        padding: 10px 14px;
+        padding: 9px 12px;
     }
 
     .message-text {
-        font-size: 0.95rem;
+        font-size: 0.92rem;
     }
 
     #suggestions,
     .suggestions {
         grid-template-columns: minmax(0, 1fr);
-        gap: 8px;
-        padding: 4px 14px 10px;
+        gap: 6px;
+        padding: 3px 14px 8px;
     }
 
     .suggestion,
     #suggestions button {
-        padding: 11px 13px 12px;
+        padding: 8px 11px;
     }
 
     .suggestion-title {
-        font-size: 1rem;
+        font-size: 0.94rem;
+    }
+
+    .suggestion-description {
+        font-size: 0.73rem;
     }
 
     .composer {
-        padding: 4px 12px max(10px, env(safe-area-inset-bottom));
+        padding: 4px 12px max(8px, env(safe-area-inset-bottom));
     }
 
     #chat-form {
@@ -1029,9 +1078,7 @@ a:focus-visible {
     }
 }
 
-/* --------------------------------------------------
-   Reduced motion
-   -------------------------------------------------- */
+/* reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
     *,
